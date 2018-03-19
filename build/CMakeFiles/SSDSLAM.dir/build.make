@@ -90,6 +90,7 @@ SSDSLAM_EXTERNAL_OBJECTS =
 
 SSDSLAM: CMakeFiles/SSDSLAM.dir/src/main.cpp.o
 SSDSLAM: CMakeFiles/SSDSLAM.dir/build.make
+SSDSLAM: libklt.a
 SSDSLAM: /opt/ros/kinetic/lib/libopencv_stitching3.so.3.3.1
 SSDSLAM: /opt/ros/kinetic/lib/libopencv_superres3.so.3.3.1
 SSDSLAM: /opt/ros/kinetic/lib/libopencv_videostab3.so.3.3.1

@@ -7,7 +7,7 @@
 
 using namespace cv;
 using namespace klt;
-
+using namespace std;
 namespace klt{
     
     #define KLT_TRACKED           0
@@ -25,7 +25,7 @@ namespace klt{
     vector<Mat> prevPyr, currPyr;
     vector<Mat> prevGradx, currGradx;
     vector<Mat> prevGrady, currGrady;
-    
+    typedef enum {SELECTING_ALL, REPLACING_SOME} selectionMode;
     KLTtracker(int nfeatures){
         this->tracker.sequentialMode = true;
         this->tracker.writeInternalImages = false;
@@ -37,7 +37,7 @@ namespace klt{
 
     void selectGoodFeatures(Mat Img, vector<kltFeature> &fl);
     void storeFeatureList();
-    static void _enforceMinimumDistance(int *pointlist, int npoints,vector<kltFeature> &fl,bool overwriteAllFeatures);
+    void _enforceMinimumDistance(int *pointlist, int npoints,vector<kltFeature> &fl,int cols, int rows,bool overwriteAllFeatures);
     void _KLTSelectGoodFeatures(Mat Img, vector<kltFeature> &fl, selectionMode mode);
     void trackFeatures(Mat currImg, Mat prevImg, vector<kltFeature> currfl, vector<kltFeature> &prevfl);
     void replaceLostFeatures(Mat Img, vector<kltFeature> &fl);

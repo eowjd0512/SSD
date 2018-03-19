@@ -1,2 +1,2 @@
-/usr/bin/ar qc libklt.a  CMakeFiles/klt.dir/thirdParty/klt/klt.c.o CMakeFiles/klt.dir/thirdParty/klt/pnmio.cpp.o CMakeFiles/klt.dir/thirdParty/klt/klt_util.c.o CMakeFiles/klt.dir/thirdParty/klt/pyramid.c.o CMakeFiles/klt.dir/thirdParty/klt/selectGoodFeatures.c.o CMakeFiles/klt.dir/thirdParty/klt/storeFeatures.c.o CMakeFiles/klt.dir/thirdParty/klt/trackFeatures.c.o CMakeFiles/klt.dir/thirdParty/klt/writeFeatures.c.o CMakeFiles/klt.dir/thirdParty/klt/error.c.o CMakeFiles/klt.dir/thirdParty/klt/convolve.c.o
+/usr/bin/ar qc libklt.a  CMakeFiles/klt.dir/src/klt/klt.cpp.o CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o
 /usr/bin/ranlib libklt.a

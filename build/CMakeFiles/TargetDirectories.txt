@@ -4,6 +4,7 @@
 /home/jun/SSD_SLAM/build/CMakeFiles/ContinuousCoverage.dir
 /home/jun/SSD_SLAM/build/CMakeFiles/ContinuousTest.dir
 /home/jun/SSD_SLAM/build/CMakeFiles/ContinuousBuild.dir
+/home/jun/SSD_SLAM/build/CMakeFiles/klt.dir
 /home/jun/SSD_SLAM/build/CMakeFiles/ContinuousMemCheck.dir
 /home/jun/SSD_SLAM/build/CMakeFiles/Nightly.dir
 /home/jun/SSD_SLAM/build/CMakeFiles/package.dir

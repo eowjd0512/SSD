@@ -6,6 +6,7 @@ using namespace cv;
 namespace klt{
 class kltFeature{
     public:
+
     Point2f pt;
     int val;	
     /* for affine mapping */
@@ -19,8 +20,7 @@ class kltFeature{
     float aff_Axy;
     float aff_Ayy;
 
-    kltFeature(){
-}
+    kltFeature(){}
     ~kltFeature(){}
 };
 

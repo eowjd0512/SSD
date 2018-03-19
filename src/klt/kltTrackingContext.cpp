@@ -1,6 +1,6 @@
 #include <iostream>
 #include "kltTrackingContext.h"
-
+using namespace std;
 namespace klt{
 void kltTrackingContext::KLTUpdateTCBorder(){
     float val;
@@ -68,6 +68,8 @@ void kltTrackingContext::KLTUpdateTCBorder(){
 
   this->borderx = border;
   this->bordery = border;
+  //cout<<"boderx: !! "<< this->borderx<<endl;
+  //cout<<"bodery: !! "<< this->bordery<<endl;
 }
 
 void kltTrackingContext::KLTChangeTCPyramid(){

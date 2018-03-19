@@ -5,7 +5,7 @@
 using namespace cv;
 
 namespace klt{
-    typedef enum {SELECTING_ALL, REPLACING_SOME} selectionMode;
+    
     /*********************************************************************
      * _sortPointList
      */
@@ -84,8 +84,127 @@ namespace klt{
     {
     return (float) ((gxx + gyy - sqrt((gxx - gyy)*(gxx - gyy) + 4*gxy*gxy))/2.0f);
     }
-    void KLTtracker::_enforceMinimumDistance(int *pointlist, int npoints,vector<kltFeature> &fl,bool overwriteAllFeatures){
-        
+    /*********************************************************************/
+
+    static void _fillFeaturemap(
+    int x, int y, 
+    Mat &featuremap, 
+    int mindist, 
+    int ncols, 
+    int nrows)
+    {
+    int ix, iy;
+
+    for (iy = y - mindist ; iy <= y + mindist ; iy++)
+        for (ix = x - mindist ; ix <= x + mindist ; ix++)
+        if (ix >= 0 && ix < ncols && iy >= 0 && iy < nrows)
+            featuremap.data[iy*ncols+ix] = 1;
+    }
+    void KLTtracker::_enforceMinimumDistance(int *pointlist, int npoints,vector<kltFeature> &fl,int cols, int rows, bool overwriteAllFeatures){
+        int indx;          /* Index into features */
+        int x, y, val;     /* Location and trackability of pixel under consideration */
+        //unsigned char *featuremap; /* Boolean array recording proximity of features */
+        int *ptr;
+        int mindist = this->tracker.mindist; 
+        /* Cannot add features with an eigenvalue less than one */
+        if (this->tracker.min_eigenvalue < 1)  this->tracker.min_eigenvalue = 1;
+
+        /* Allocate memory for feature map and clear it */
+        Mat featuremap = Mat::zeros(rows,cols,CV_8UC1);
+        //featuremap = (unsigned char *) malloc(ncols * nrows * sizeof(unsigned char));
+        //memset(featuremap, 0, ncols*nrows);
+            
+        /* Necessary because code below works with (mindist-1) */
+        mindist--;
+        /* If we are keeping all old good features, then add them to the featuremap */
+        if (!overwriteAllFeatures)
+            for (indx = 0 ; indx < this->nfeatures ; indx++)
+            if (fl[indx].val >= 0)  {
+                x   = (int) fl[indx].pt.x;
+                y   = (int) fl[indx].pt.y;
+                _fillFeaturemap(x, y, featuremap, mindist, cols, rows);
+            }
+        /* For each feature point, in descending order of importance, do ... */
+        ptr = pointlist;
+        indx = 0;
+        while (1)  {
+            /* If we can't add all the points, then fill in the rest
+            of the featurelist with -1's */
+            if (ptr >= pointlist + 3*npoints)  {
+            while (indx < this->nfeatures)  {	
+                if (overwriteAllFeatures || 
+                    fl[indx].val < 0) {
+                fl[indx].pt.x   = -1;
+                fl[indx].pt.y   = -1;
+                fl[indx].val = KLT_NOT_FOUND;
+            fl[indx].aff_img.empty();
+            fl[indx].aff_img_gradx.empty();
+            fl[indx].aff_img_grady.empty();
+            fl[indx].aff_x = -1.0;
+            fl[indx].aff_y = -1.0;
+            fl[indx].aff_Axx = 1.0;
+            fl[indx].aff_Ayx = 0.0;
+            fl[indx].aff_Axy = 0.0;
+            fl[indx].aff_Ayy = 1.0;
+                }
+                indx++;
+            }
+            break;
+            }
+
+            x   = *ptr++;
+            y   = *ptr++;
+            val = *ptr++;
+                
+            /* Ensure that feature is in-bounds */
+            assert(x >= 0);
+            assert(x < cols);
+            assert(y >= 0);
+            assert(y < rows);
+            
+            while (!overwriteAllFeatures && 
+                indx < this->nfeatures &&
+                fl[indx].val >= 0)
+            indx++;
+
+            if (indx >= this->nfeatures)  break;
+
+            /* If no neighbor has been selected, and if the minimum
+            eigenvalue is large enough, then add feature to the current list */
+            if (!featuremap.data[y*cols+x] && val >= this->tracker.min_eigenvalue)  {
+                kltFeature f;
+                f.pt.x = x;
+                f.pt.y = y;
+                f.val = (int)val;
+                f.aff_x=-1.0;
+                f.aff_y=-1.0;
+                f.aff_Axx = 1.0;
+                f.aff_Ayx = 0.0;
+                f.aff_Axy = 0.0;
+                f.aff_Ayy = 1.0;
+                fl.push_back(f);
+            /*featurelist->feature[indx]->x   = (KLT_locType) x;
+            featurelist->feature[indx]->y   = (KLT_locType) y;
+            featurelist->feature[indx]->val = (int) val;
+            featurelist->feature[indx]->aff_img = NULL;
+            featurelist->feature[indx]->aff_img_gradx = NULL;
+            featurelist->feature[indx]->aff_img_grady = NULL;
+            featurelist->feature[indx]->aff_x = -1.0;
+            featurelist->feature[indx]->aff_y = -1.0;
+            featurelist->feature[indx]->aff_Axx = 1.0;
+            featurelist->feature[indx]->aff_Ayx = 0.0;
+            featurelist->feature[indx]->aff_Axy = 0.0;
+            featurelist->feature[indx]->aff_Ayy = 1.0;*/
+            indx++;
+
+            /* Fill in surrounding region of feature map, but
+                make sure that pixels are in-bounds */
+            _fillFeaturemap(x, y, featuremap, mindist, cols, rows);
+            }
+        }
+
+        /* Free feature map  */
+        //free(featuremap);
     }
     void KLTtracker::_KLTSelectGoodFeatures(Mat Img, vector<kltFeature> &fl, selectionMode mode){
         Mat floatimg, gradx, grady;
@@ -96,13 +215,12 @@ namespace klt{
         bool floatimages_created = false;
         window_hw = this->tracker.window_width/2; 
         window_hh = this->tracker.window_height/2;
-        int nrows = floatimg.rows;
-        int ncols = floatimg.cols;
+        int nrows = Img.rows;
+        int ncols = Img.cols;
         /* Create pointlist, which is a simplified version of a featurelist, */
          /* for speed.  Contains only integer locations and values. */
         //vector<int> pointlist;
         pointlist = (int *) malloc(ncols * nrows * 3 * sizeof(int));
-
         if (mode == REPLACING_SOME && this->tracker.sequentialMode && !this->currPyr.empty())  {
             floatimg = this->currPyr[0];
             gradx = this->currGradx[0];
@@ -110,7 +228,7 @@ namespace klt{
             assert(!gradx.empty());
             assert(!grady.empty());
         } else  {
-            floatimages_created = TRUE;
+            //floatimages_created = TRUE;
             //floatimg = _KLTCreateFloatImage(ncols, nrows);
             //gradx    = _KLTCreateFloatImage(ncols, nrows);
             //grady    = _KLTCreateFloatImage(ncols, nrows);
@@ -126,12 +244,12 @@ namespace klt{
             } else
                 //KLTToFloatImage(img, ncols, nrows, floatimg);
                 floatimg = Img;
-            
             /* Compute gradient of image in x and y direction */
             //_KLTComputeGradients(floatimg, tc->grad_sigma, gradx, grady);
             Sobel(floatimg, gradx,-1,1,0,3);
             Sobel(floatimg, grady,-1,0,1,3);
-
+            //imwrite("/home/jun/SSD_SLAM/debug/gradx.jpg", gradx);
+            //imwrite("/home/jun/SSD_SLAM/debug/grady.jpg", grady);
             {
             float gx, gy;
             float gxx, gxy, gyy;
@@ -149,13 +267,11 @@ namespace klt{
 
             /* Find largest value of an int */
             limit = 2147483647;
-                
             /* For most of the pixels in the image, do ... */
             ptr = pointlist;
-            
+
             for (y = bordery ; y < nrows - bordery ; y += this->tracker.nSkippedPixels + 1)
             for (x = borderx ; x < ncols - borderx ; x += this->tracker.nSkippedPixels + 1)  {
-
                 /* Sum the gradients in the surrounding window */
                 gxx = 0;  gxy = 0;  gyy = 0;
                 for (yy = y-window_hh ; yy <= y+window_hh ; yy++)
@@ -173,29 +289,29 @@ namespace klt{
                 *ptr++ = y;
                 val = _minEigenvalue(gxx, gxy, gyy);
                 if (val > limit)  {
-                std::cout<<"(_KLTSelectGoodFeatures) minimum eigenvalueisgreater than the capacity of an int; setting "<<std::endl;
+                //std::cout<<"(_KLTSelectGoodFeatures) minimum eigenvalueisgreater than the capacity of an int; setting "<<std::endl;
                 val = (float) limit;
                 }
                 *ptr++ = (int) val;
                 npoints++;
-            }
+                }
         }
           /* Sort the features  */
         _sortPointList(pointlist, npoints);
         /* Enforce minimum distance between features */
-        _enforceMinimumDistance(pointlist,npoints,fl,overwriteAllFeatures);
+        _enforceMinimumDistance(pointlist,npoints,fl,floatimg.cols,floatimg.rows,overwriteAllFeatures);
         /* Free memory */
+        
         free(pointlist);
         }
     }
     void KLTtracker::selectGoodFeatures(Mat Img, vector<kltFeature> &fl){
-        fprintf(stderr,  "(KLT) Selecting the %d best features ",this->nfeatures);
+        //fprintf(stderr,  "(KLT) Selecting the %d best features ",this->nfeatures);
         fflush(stderr);
+        
         _KLTSelectGoodFeatures(Img, fl, SELECTING_ALL);
     }
-    void KLTtracker::trackFeatures(Mat currImg, Mat prevImg, vector<kltFeature> currfl, vector<kltFeature> &prevfl){
-  
-    }
+    
     void KLTtracker::replaceLostFeatures(Mat Img, vector<kltFeature> &fl){
         int nLostFeatures = this->nfeatures - KLTCountRemainingFeatures(this->nfeatures, fl);
 

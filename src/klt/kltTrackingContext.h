@@ -87,7 +87,8 @@ class kltTrackingContext{
         affine_max_residue = 10.0;
         affine_min_displacement = 0.2f;
         affine_max_displacement_differ = 1.5f;
-
+        KLTChangeTCPyramid();
+        KLTUpdateTCBorder();
     }
     void KLTChangeTCPyramid();
     void KLTUpdateTCBorder();

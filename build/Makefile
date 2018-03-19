@@ -196,6 +196,19 @@ ContinuousBuild/fast:
 .PHONY : ContinuousBuild/fast
 
 #=============================================================================
+# Target rules for targets named klt
+
+# Build rule for target.
+klt: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 klt
+.PHONY : klt
+
+# fast build rule for target.
+klt/fast:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/build
+.PHONY : klt/fast
+
+#=============================================================================
 # Target rules for targets named ContinuousMemCheck
 
 # Build rule for target.
@@ -520,6 +533,60 @@ ContinuousUpdate/fast:
 	$(MAKE) -f CMakeFiles/ContinuousUpdate.dir/build.make CMakeFiles/ContinuousUpdate.dir/build
 .PHONY : ContinuousUpdate/fast
 
+src/klt/klt.o: src/klt/klt.cpp.o
+
+.PHONY : src/klt/klt.o
+
+# target to build an object file
+src/klt/klt.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/klt.cpp.o
+.PHONY : src/klt/klt.cpp.o
+
+src/klt/klt.i: src/klt/klt.cpp.i
+
+.PHONY : src/klt/klt.i
+
+# target to preprocess a source file
+src/klt/klt.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/klt.cpp.i
+.PHONY : src/klt/klt.cpp.i
+
+src/klt/klt.s: src/klt/klt.cpp.s
+
+.PHONY : src/klt/klt.s
+
+# target to generate assembly for a file
+src/klt/klt.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/klt.cpp.s
+.PHONY : src/klt/klt.cpp.s
+
+src/klt/kltTrackingContext.o: src/klt/kltTrackingContext.cpp.o
+
+.PHONY : src/klt/kltTrackingContext.o
+
+# target to build an object file
+src/klt/kltTrackingContext.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o
+.PHONY : src/klt/kltTrackingContext.cpp.o
+
+src/klt/kltTrackingContext.i: src/klt/kltTrackingContext.cpp.i
+
+.PHONY : src/klt/kltTrackingContext.i
+
+# target to preprocess a source file
+src/klt/kltTrackingContext.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.i
+.PHONY : src/klt/kltTrackingContext.cpp.i
+
+src/klt/kltTrackingContext.s: src/klt/kltTrackingContext.cpp.s
+
+.PHONY : src/klt/kltTrackingContext.s
+
+# target to generate assembly for a file
+src/klt/kltTrackingContext.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.s
+.PHONY : src/klt/kltTrackingContext.cpp.s
+
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -559,6 +626,7 @@ help:
 	@echo "... ContinuousCoverage"
 	@echo "... ContinuousTest"
 	@echo "... ContinuousBuild"
+	@echo "... klt"
 	@echo "... ContinuousMemCheck"
 	@echo "... Nightly"
 	@echo "... package"
@@ -587,6 +655,12 @@ help:
 	@echo "... ExperimentalSubmit"
 	@echo "... ContinuousStart"
 	@echo "... ContinuousUpdate"
+	@echo "... src/klt/klt.o"
+	@echo "... src/klt/klt.i"
+	@echo "... src/klt/klt.s"
+	@echo "... src/klt/kltTrackingContext.o"
+	@echo "... src/klt/kltTrackingContext.i"
+	@echo "... src/klt/kltTrackingContext.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

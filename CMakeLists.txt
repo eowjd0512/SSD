@@ -23,9 +23,9 @@ find_package(Eigen3 REQUIRED)
 find_package(OpenCV QUIET)
 
 
-#set(klt_SOURCE_FILES
-#  ${PROJECT_SOURCE_DIR}/thirdParty/klt/klt.c
-#  ${PROJECT_SOURCE_DIR}/thirdParty/klt/pnmio.cpp
+set(klt_SOURCE_FILES
+  ${PROJECT_SOURCE_DIR}/src/klt/klt.cpp
+  ${PROJECT_SOURCE_DIR}/src/klt/kltTrackingContext.cpp
 #  ${PROJECT_SOURCE_DIR}/thirdParty/klt/klt_util.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/pyramid.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/selectGoodFeatures.c
@@ -34,7 +34,7 @@ find_package(OpenCV QUIET)
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/writeFeatures.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/error.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/convolve.c
-#)
+)
 
 include(CTest)
 enable_testing()
@@ -45,7 +45,7 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
 #compile main library
-#add_library(klt ${klt_SOURCE_FILES})
+add_library(klt ${klt_SOURCE_FILES})
 
 #add_executable(SSDSLAM main.cpp)
 
@@ -55,5 +55,5 @@ if (OpenCV_FOUND)
     include_directories( ${OpenCV_INCLUDE_DIRS} )
     set(HAS_OPENCV 1)
     add_executable(SSDSLAM ${PROJECT_SOURCE_DIR}/src/main.cpp)
-    target_link_libraries(SSDSLAM ${OpenCV_LIBS})
+    target_link_libraries(SSDSLAM klt ${OpenCV_LIBS})
 endif()
