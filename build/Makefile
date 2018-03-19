@@ -560,6 +560,33 @@ src/klt/klt.cpp.s:
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/klt.cpp.s
 .PHONY : src/klt/klt.cpp.s
 
+src/klt/kltTracking.o: src/klt/kltTracking.cpp.o
+
+.PHONY : src/klt/kltTracking.o
+
+# target to build an object file
+src/klt/kltTracking.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o
+.PHONY : src/klt/kltTracking.cpp.o
+
+src/klt/kltTracking.i: src/klt/kltTracking.cpp.i
+
+.PHONY : src/klt/kltTracking.i
+
+# target to preprocess a source file
+src/klt/kltTracking.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/kltTracking.cpp.i
+.PHONY : src/klt/kltTracking.cpp.i
+
+src/klt/kltTracking.s: src/klt/kltTracking.cpp.s
+
+.PHONY : src/klt/kltTracking.s
+
+# target to generate assembly for a file
+src/klt/kltTracking.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/kltTracking.cpp.s
+.PHONY : src/klt/kltTracking.cpp.s
+
 src/klt/kltTrackingContext.o: src/klt/kltTrackingContext.cpp.o
 
 .PHONY : src/klt/kltTrackingContext.o
@@ -658,6 +685,9 @@ help:
 	@echo "... src/klt/klt.o"
 	@echo "... src/klt/klt.i"
 	@echo "... src/klt/klt.s"
+	@echo "... src/klt/kltTracking.o"
+	@echo "... src/klt/kltTracking.i"
+	@echo "... src/klt/kltTracking.s"
 	@echo "... src/klt/kltTrackingContext.o"
 	@echo "... src/klt/kltTrackingContext.i"
 	@echo "... src/klt/kltTrackingContext.s"

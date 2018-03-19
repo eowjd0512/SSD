@@ -19,8 +19,8 @@ using namespace klt;
 #define KLT
 
 #ifdef KLT
-
-void DrawTrackingPoints(vector<kltFeature> &featurelist, Mat &image){
+bool initialization = false;
+void DrawTrackingPoints(vector<kltFeature> featurelist, Mat &image){
   /// Draw corners detected
     for(int i = 0; i < featurelist.size(); i++){ 
       int x= cvRound(featurelist[i].pt.x);
@@ -37,17 +37,18 @@ int main (int argc, char *argv[])
   }
   Size size = Size((int)cap.get(CV_CAP_PROP_FRAME_WIDTH),(int)cap.get(CV_CAP_PROP_FRAME_HEIGHT));
   double fps = cap.get(CV_CAP_PROP_FPS);
-  Mat currImage, prevImage;
-  Mat frame,dstImage;
+  Mat currImg, prevImg;
+  Mat frame,dstImg;
   namedWindow("distImage");
   double qualityLevel = 0.01;
   double minDistance = 10;
   int blockSize = 3;
   bool useHarrisDetector = false;
   double k = 0.04;
-  int maxCorners = 100;
+  int maxCorners = 200;
 
   KLTtracker kltTracker(maxCorners);
+  kltTracker.tracker.sequentialMode = true;
 
   //TermCriteria criteria=TermCriteria(TermCriteria::COUNT+TermCriteria::EPS,10,0.01);
   Size winSize(11,11);
@@ -60,37 +61,44 @@ int main (int argc, char *argv[])
 
   int nframe=0;
   //KLT klt = new KLT();
+  
+  vector<kltFeature> prevFeaturelist;
+  vector<kltFeature> currFeaturelist;
   for(;;){
-    vector<kltFeature> featurelist;
+    
     cap>>frame;
     if(frame.empty()) break;
-    frame.copyTo(dstImage);
+    frame.copyTo(dstImg);
     /// Copy the source image
 
-    cvtColor(dstImage,currImage,CV_BGR2GRAY);
+    cvtColor(dstImg,currImg,CV_BGR2GRAY);
     //GaussianBlur(currImage,currImage,Size(5,5),0.5);
-    kltTracker.selectGoodFeatures(currImage,featurelist);
-    //feature detection
-    //if(initialization){
-    //goodFeaturesToTrack( prevImage,prevPoints, maxCorners, qualityLevel, minDistance, Mat(), blockSize, useHarrisDetector, k );
-    //cornerSubPix(prevImage,prevPoints,winSize,Size(-1,-1),criteria);
-    DrawTrackingPoints(featurelist,dstImage);
-    //initialization = false;
-    //}
     
-      //DrawTrackingPoints(currPoints,dstImage);
+    //feature detection
+    if(initialization){
+      prevFeaturelist.clear();
+      currFeaturelist.clear();
+      kltTracker.selectGoodFeatures(currImg,currFeaturelist);
+      DrawTrackingPoints(currFeaturelist,dstImg);
+      initialization = false;
+    }
 
-      //prevPoints = currPoints;
-    //}
+    if(!initialization &&prevFeaturelist.size()>0){
+      kltTracker.trackFeatures(prevImg,currImg,prevFeaturelist,currFeaturelist);
+      //kltTracker.replaceLostFeatures(currImg, currFeaturelist);
+      //cout<<currFeaturelist[0].val<<endl;
+      DrawTrackingPoints(currFeaturelist,dstImg);
+    }
     /// Show what you got 
     //namedWindow( source_window, CV_WINDOW_AUTOSIZE );
-    imshow( "KLT dstImage", dstImage );
+    imshow( "KLT dstImage", dstImg );
     //imshow("frame",frame);
-    //currImage.copyTo(prevImage);
-
+    currImg.copyTo(prevImg);
+    prevFeaturelist.clear();
+    prevFeaturelist = currFeaturelist;
     int ch = waitKey(delay);
     if(ch == 27) break;       // 27 == ESC key
-    //if (ch ==32) initialization = true;
+    if (ch ==32) initialization = true;
     
   }
   return 0;
@@ -115,7 +123,7 @@ void DrawTrackingPoints(vector<Point2f> &points, Mat &image){
 }
 int main (int argc, char *argv[])
 {
-  VideoCapture cap(1);
+  VideoCapture cap(0);
   if(!cap.isOpened()){
     cout<<"Cannot open cap"<<endl;
     return 0;
@@ -164,7 +172,7 @@ int main (int argc, char *argv[])
       Mat status,err;
       buildOpticalFlowPyramid(prevImage,prevPyr,winSize,3,true);
       buildOpticalFlowPyramid(currImage,currPyr,winSize,3,true);
-      currPoints = prevPoints; //for OPTFLOW_USE_INITIAL_FLOW
+      //currPoints = prevPoints; //for OPTFLOW_USE_INITIAL_FLOW
       calcOpticalFlowPyrLK(prevPyr,currPyr,prevPoints,currPoints,status,err,winSize);
 
       /*//delete invalid correspondinig points

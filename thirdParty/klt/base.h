@@ -5,21 +5,20 @@
 #ifndef _BASE_H_
 #define _BASE_H_
 
-//#ifndef uchar
-//#define uchar unsigned char
-//#endif
+#ifndef uchar
+#define uchar unsigned char
+#endif
+#ifndef schar
+#define schar signed char
+#endif
 
-//#ifndef schar
-//#define schar signed char
-//#endif
-
-/*#ifndef uint
+#ifndef uint
 #define uint unsigned int
-#endif*/
+#endif
 
-//#ifndef ushort
-//#define ushort unsigned short
-//#endif
+#ifndef ushort
+#define ushort unsigned short
+#endif
 
 #ifndef ulong
 #define ulong unsigned long

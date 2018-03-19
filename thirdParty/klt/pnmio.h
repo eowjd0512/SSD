@@ -6,8 +6,6 @@
 #define _PNMIO_H_
 
 #include <stdio.h>
-#include "cv.hpp"
-using namespace cv;
 /**********
  * With pgmReadFile and pgmRead, setting img to NULL causes memory
  * to be allocated
@@ -53,6 +51,4 @@ void ppmWrite(
   unsigned char *blueimg,
   int ncols,
   int nrows);
-unsigned char* readMat(cv::Mat frame, unsigned char *img, int *ncols, int *nrows)
-
 #endif

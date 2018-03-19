@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/klt.dir/src/klt/klt.cpp.o"
   "CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o"
+  "CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o"
   "libklt.pdb"
   "libklt.a"
 )

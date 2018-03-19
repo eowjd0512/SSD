@@ -3,7 +3,7 @@
 #include "cv.hpp"
 
 using namespace cv;
-
+using namespace std;
 namespace klt{
 
     #define KLT_BOOL int
@@ -64,10 +64,10 @@ class kltTrackingContext{
         mindist = 10;
         window_width = 7;
         window_height = 7;
-        sequentialMode = false;
+        sequentialMode = true;
         smoothBeforeSelecting = true;
-        writeInternalImages = false;
-        lighting_insensitive = false;
+        writeInternalImages = true;
+        lighting_insensitive = true;
         min_eigenvalue = 1;
         min_determinant = 0.01f;
         max_iterations = 10;

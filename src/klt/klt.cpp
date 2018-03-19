@@ -110,7 +110,7 @@ namespace klt{
         if (this->tracker.min_eigenvalue < 1)  this->tracker.min_eigenvalue = 1;
 
         /* Allocate memory for feature map and clear it */
-        Mat featuremap = Mat::zeros(rows,cols,CV_8UC1);
+        Mat featuremap = Mat::zeros(rows,cols,CV_32FC1);
         //featuremap = (unsigned char *) malloc(ncols * nrows * sizeof(unsigned char));
         //memset(featuremap, 0, ncols*nrows);
             
@@ -228,6 +228,7 @@ namespace klt{
             assert(!gradx.empty());
             assert(!grady.empty());
         } else  {
+            Img.convertTo(floatimg, CV_32FC1);
             //floatimages_created = TRUE;
             //floatimg = _KLTCreateFloatImage(ncols, nrows);
             //gradx    = _KLTCreateFloatImage(ncols, nrows);

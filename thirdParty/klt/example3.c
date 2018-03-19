@@ -33,7 +33,7 @@ int main()
   //creates a feature table, given the number of frames and the number of features to store. Although in this example the number of frames is the same as the total number of actual images, this does not have to be the case if all the features do not need to be stored.
   ft = KLTCreateFeatureTable(nFrames, nFeatures);
   tc->sequentialMode = TRUE;
-  tc->writeInternalImages = FALSE;
+  tc->writeInternalImages = TRUE;
   tc->affineConsistencyCheck = -1;  /* set this to 2 to turn on affine consistency check */
  
   img1 = pgmReadFile("img0.pgm", NULL, &ncols, &nrows);

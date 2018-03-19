@@ -14,7 +14,7 @@
 /* Our includes */
 #include "base.h"
 #include "error.h"
-#include "pnmio.hpp"		/* ppmWriteFileRGB() */
+#include "pnmio.h"		/* ppmWriteFileRGB() */
 #include "klt.h"
 
 #define BINHEADERLENGTH	6

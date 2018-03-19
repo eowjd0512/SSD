@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/jun/SSD_SLAM/src/klt/klt.cpp" "/home/jun/SSD_SLAM/build/CMakeFiles/klt.dir/src/klt/klt.cpp.o"
+  "/home/jun/SSD_SLAM/src/klt/kltTracking.cpp" "/home/jun/SSD_SLAM/build/CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o"
   "/home/jun/SSD_SLAM/src/klt/kltTrackingContext.cpp" "/home/jun/SSD_SLAM/build/CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

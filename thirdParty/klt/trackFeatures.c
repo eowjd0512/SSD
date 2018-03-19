@@ -1321,7 +1321,7 @@ void KLTTrackFeatures(
 		pyramid2_grady->img[i]);
 
 	/* Write internal images */
-	if (tc->writeInternalImages)  {
+	if (1)  {
 		char fname[80];
 		for (i = 0 ; i < tc->nPyramidLevels ; i++)  {
 			sprintf(fname, "kltimg_tf_i%d.pgm", i);

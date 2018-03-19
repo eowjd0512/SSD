@@ -194,7 +194,7 @@ clean: CMakeFiles/ContinuousBuild.dir/clean
 CMakeFiles/klt.dir/all:
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/depend
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jun/SSD_SLAM/build/CMakeFiles --progress-num=3,4,5 "Built target klt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jun/SSD_SLAM/build/CMakeFiles --progress-num=3,4,5,6 "Built target klt"
 .PHONY : CMakeFiles/klt.dir/all
 
 # Include target in all.
@@ -204,7 +204,7 @@ all: CMakeFiles/klt.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/klt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jun/SSD_SLAM/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jun/SSD_SLAM/build/CMakeFiles 4
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/klt.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/jun/SSD_SLAM/build/CMakeFiles 0
 .PHONY : CMakeFiles/klt.dir/rule
@@ -561,7 +561,7 @@ all: CMakeFiles/SSDSLAM.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/SSDSLAM.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jun/SSD_SLAM/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jun/SSD_SLAM/build/CMakeFiles 6
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/SSDSLAM.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/jun/SSD_SLAM/build/CMakeFiles 0
 .PHONY : CMakeFiles/SSDSLAM.dir/rule

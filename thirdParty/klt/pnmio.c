@@ -11,10 +11,8 @@
 
 /* Our includes */
 #include "error.h"
-#include "cv.hpp"
 #define LENGTH 80
 
-using namespace cv;
 /*********************************************************************/
 
 static void _getNextString(
@@ -220,13 +218,6 @@ unsigned char* pgmReadFile(
 
   /* Close file */
   fclose(fp);
-
-  return ptr;
-}
-unsigned char* readMat(cv::Mat frame, unsigned char *img, int *ncols, int *nrows)
-{
-
-  unsigned char* ptr = (unsigned char*)frame.data;
 
   return ptr;
 }

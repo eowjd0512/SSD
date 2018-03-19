@@ -10,7 +10,7 @@
 /* Our includes */
 #include "base.h"
 #include "error.h"
-#include "pnmio.hpp"
+#include "pnmio.h"
 #include "klt.h"
 #include "klt_util.h"
 
