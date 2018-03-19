@@ -39,7 +39,9 @@ namespace klt{
     void storeFeatureList();
     void _enforceMinimumDistance(int *pointlist, int npoints,vector<kltFeature> &fl,int cols, int rows,bool overwriteAllFeatures);
     void _KLTSelectGoodFeatures(Mat Img, vector<kltFeature> &fl, selectionMode mode);
-    void trackFeatures(Mat currImg, Mat prevImg, vector<kltFeature> currfl, vector<kltFeature> &prevfl);
+    void trackFeatures(Mat prevImg, Mat currImg, vector<kltFeature> prevfl, vector<kltFeature> &currfl);
+    int _trackFeature(float x1, float y1, float *x2, float *y2,
+                      Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2);
     void replaceLostFeatures(Mat Img, vector<kltFeature> &fl);
 
     ~KLTtracker(){

@@ -54,9 +54,9 @@ class kltTrackingContext{
     by the affine tracker and the frame to frame tracker in pel*/
 
     /* User must not touch these */
-    Mat pyramid_last;
-    Mat pyramid_last_gradx;
-    Mat pyramid_last_grady;
+    vector<Mat> pyramid_last;
+    vector<Mat> pyramid_last_gradx;
+    vector<Mat> pyramid_last_grady;
     
     //Mat kernal;
     kltTrackingContext(){
