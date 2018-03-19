@@ -1,0 +1,3 @@
+// the configured options and settings for SSDSLAM
+#define SSD_VERSION_MAJOR @SSD_VERSION_MAJOR@
+#define SSD_VERSION_MINOR @SSD_VERSION_MINOR@

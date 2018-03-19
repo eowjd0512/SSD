@@ -1,0 +1,8 @@
+{
+    // Code Runner "CPP" 설정
+    "code-runner.executorMap": {
+        //"cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt"
+        
+        "cpp": "cd /home/jun/SSD_SLAM && chmod +x build.sh && ./build.sh"}
+        
+}

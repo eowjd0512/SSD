@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/jun/SSD_SLAM/build",
+  "command": "/usr/bin/c++    -I/home/jun/SSD_SLAM/build -I/home/jun/SSD_SLAM/src -I/home/jun/SSD_SLAM/thirdParty/klt -isystem /opt/ros/kinetic/include/opencv-3.3.1 -isystem /opt/ros/kinetic/include/opencv-3.3.1/opencv  -O3 -DNDEBUG   -o CMakeFiles/SSDSLAM.dir/src/main.cpp.o -c /home/jun/SSD_SLAM/src/main.cpp",
+  "file": "/home/jun/SSD_SLAM/src/main.cpp"
+}
+]
