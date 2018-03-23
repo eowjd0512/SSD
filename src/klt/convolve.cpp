@@ -11,22 +11,15 @@
 /* Our includes */
 //#include "base.h"
 //#include "error.h"
-#include "convolve.h"
+#include "convolve.hpp"
 //#include "klt_util.h"   /* printing */
 
-#define MAX_KERNEL_WIDTH 	71
+
 using namespace std;
 using namespace cv;
 namespace klt{
-typedef struct  {
-  int width;
-  float data[MAX_KERNEL_WIDTH];
-}  ConvolutionKernel;
+#define MAX_KERNEL_WIDTH 	71
 
-/* Kernels */
-static ConvolutionKernel gauss_kernel;
-static ConvolutionKernel gaussderiv_kernel;
-static float sigma_last = -10.0;
 
 
 /*********************************************************************
@@ -36,30 +29,13 @@ static float sigma_last = -10.0;
  * data to a float image.
  */
 
-void _KLTToFloatImage(
-  KLT_PixelType *img,
-  int ncols, int nrows,
-  _KLT_FloatImage floatimg)
-{
-  KLT_PixelType *ptrend = img + ncols*nrows;
-  float *ptrout = floatimg->data;
-
-  /* Output image must be large enough to hold result */
-  assert(floatimg->ncols >= ncols);
-  assert(floatimg->nrows >= nrows);
-
-  floatimg->ncols = ncols;
-  floatimg->nrows = nrows;
-
-  while (img < ptrend)  *ptrout++ = (float) *img++;
-}
 
 
 /*********************************************************************
  * _computeKernels
  */
 
-static void _computeKernels(
+void convolution::_computeKernels(
   float sigma,
   ConvolutionKernel *gauss,
   ConvolutionKernel *gaussderiv)
@@ -113,7 +89,7 @@ static void _computeKernels(
     for (i = -hw ; i <= hw ; i++)  gaussderiv->data[i+hw] /= den;
   }
 
-  sigma_last = sigma;
+  this->sigma_last = sigma;
 }
 	
 
@@ -122,7 +98,7 @@ static void _computeKernels(
  *
  */
 
-void _KLTGetKernelWidths(
+void convolution::_KLTGetKernelWidths(
   float sigma,
   int *gauss_width,
   int *gaussderiv_width)
@@ -137,10 +113,10 @@ void _KLTGetKernelWidths(
  * _convolveImageHoriz
  */
 
-static void _convolveImageHoriz(
+void convolution::_convolveImageHoriz(
   Mat imgin,
   ConvolutionKernel kernel,
-  Mat imgout)
+  Mat &imgout)
 {
   float *ptrrow = (float*)imgin.data;           /* Points to row's first pixel */
   float *ptrout = (float*)imgout.data, /* Points to next output pixel */
@@ -189,10 +165,10 @@ static void _convolveImageHoriz(
  * _convolveImageVert
  */
 
-static void _convolveImageVert(
+void convolution::_convolveImageVert(
   Mat imgin,
   ConvolutionKernel kernel,
-  Mat imgout)
+  Mat &imgout)
 {
   float *ptrcol = (float*)imgin.data;            /* Points to row's first pixel */
   float *ptrout = (float*)imgout.data,  /* Points to next output pixel */
@@ -246,11 +222,11 @@ static void _convolveImageVert(
  * _convolveSeparate
  */
 
-static void _convolveSeparate(
+void convolution::_convolveSeparate(
   Mat imgin,
   ConvolutionKernel horiz_kernel,
   ConvolutionKernel vert_kernel,
-  Mat imgout)
+  Mat &imgout)
 {
   /* Create temporary image */
   Mat tmpimg = Mat::zeros(imgin.rows,imgin.cols,CV_32FC1);
@@ -258,8 +234,13 @@ static void _convolveSeparate(
   //tmpimg = _KLTCreateFloatImage(imgin.cols, imgin.rows);
   /* Do convolution */
   _convolveImageHoriz(imgin, horiz_kernel, tmpimg);
+ // imwrite("/home/jun/SSD_SLAM/debug/tmpimg.jpg", tmpimg);
+ //cout<<"222"<<endl;
 
   _convolveImageVert(tmpimg, vert_kernel, imgout);
+ //   imwrite("/home/jun/SSD_SLAM/debug/imgout.jpg", imgout);
+ //cout<<"222"<<endl;
+ //cout<<"333"<<endl;
 
   /* Free memory */
   //_KLTFreeFloatImage(tmpimg);
@@ -270,11 +251,11 @@ static void _convolveSeparate(
  * _KLTComputeGradients
  */
 
-void _KLTComputeGradients(
+void convolution::_KLTComputeGradients(
   Mat img,
   float sigma,
-  Mat gradx,
-  Mat grady)
+  Mat &gradx,
+  Mat &grady)
 {
 				
   /* Output images must be large enough to hold result */
@@ -286,10 +267,11 @@ void _KLTComputeGradients(
   /* Compute kernels, if necessary */
   if (fabs(sigma - sigma_last) > 0.05)
     _computeKernels(sigma, &gauss_kernel, &gaussderiv_kernel);
-	
+//cout<<"111"<<endl;
   _convolveSeparate(img, gaussderiv_kernel, gauss_kernel, gradx);
+  // cout<<"222"<<endl;
   _convolveSeparate(img, gauss_kernel, gaussderiv_kernel, grady);
-
+ //cout<<"333"<<endl;
 }
 	
 
@@ -297,10 +279,10 @@ void _KLTComputeGradients(
  * _KLTComputeSmoothedImage
  */
 
-void _KLTComputeSmoothedImage(
+void convolution::_KLTComputeSmoothedImage(
   Mat img,
   float sigma,
-  Mat smooth)
+  Mat &smooth)
 {
   /* Output image must be large enough to hold result */
   assert(smooth.cols >= img.cols);

@@ -6,14 +6,6 @@
 
 #IncludeRegexTransform: 
 
-../thirdParty/klt/convolve.h
-klt.h
-../thirdParty/klt/klt.h
-klt_util.h
-../thirdParty/klt/klt_util.h
-
-../thirdParty/klt/klt_util.h
-
 /home/jun/SSD_SLAM/src/klt/convolve.cpp
 assert.h
 -
@@ -25,8 +17,14 @@ stdlib.h
 -
 cv.hpp
 /home/jun/SSD_SLAM/src/klt/cv.hpp
-convolve.h
-/home/jun/SSD_SLAM/src/klt/convolve.h
+convolve.hpp
+/home/jun/SSD_SLAM/src/klt/convolve.hpp
+
+/home/jun/SSD_SLAM/src/klt/convolve.hpp
+iostream
+-
+cv.hpp
+/home/jun/SSD_SLAM/src/klt/cv.hpp
 
 /home/jun/SSD_SLAM/src/klt/klt.cpp
 iostream
@@ -45,6 +43,8 @@ kltFeature.h
 /home/jun/SSD_SLAM/src/klt/kltFeature.h
 kltTrackingContext.h
 /home/jun/SSD_SLAM/src/klt/kltTrackingContext.h
+convolve.hpp
+/home/jun/SSD_SLAM/src/klt/convolve.hpp
 vector
 -
 
@@ -53,6 +53,8 @@ iostream
 -
 cv.hpp
 /home/jun/SSD_SLAM/src/klt/cv.hpp
+convolve.hpp
+/home/jun/SSD_SLAM/src/klt/convolve.hpp
 
 /home/jun/SSD_SLAM/src/klt/kltTracking.cpp
 iostream
@@ -61,8 +63,8 @@ cv.hpp
 /home/jun/SSD_SLAM/src/klt/cv.hpp
 klt.h
 /home/jun/SSD_SLAM/src/klt/klt.h
-convolve.cpp
-/home/jun/SSD_SLAM/src/klt/convolve.cpp
+convolve.hpp
+/home/jun/SSD_SLAM/src/klt/convolve.hpp
 vector
 -
 string

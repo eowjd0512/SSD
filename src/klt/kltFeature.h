@@ -1,6 +1,6 @@
 #include <iostream>
 #include "cv.hpp"
-
+#include "convolve.hpp"
 using namespace cv;
 
 namespace klt{
@@ -19,7 +19,7 @@ class kltFeature{
     float aff_Ayx;
     float aff_Axy;
     float aff_Ayy;
-
+    int status;
     kltFeature(){}
     ~kltFeature(){}
 };

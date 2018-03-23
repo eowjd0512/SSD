@@ -6,6 +6,12 @@
 
 #IncludeRegexTransform: 
 
+/home/jun/SSD_SLAM/src/klt/convolve.hpp
+iostream
+-
+cv.hpp
+/home/jun/SSD_SLAM/src/klt/cv.hpp
+
 /home/jun/SSD_SLAM/src/klt/klt.h
 iostream
 -
@@ -15,6 +21,8 @@ kltFeature.h
 /home/jun/SSD_SLAM/src/klt/kltFeature.h
 kltTrackingContext.h
 /home/jun/SSD_SLAM/src/klt/kltTrackingContext.h
+convolve.hpp
+/home/jun/SSD_SLAM/src/klt/convolve.hpp
 vector
 -
 
@@ -23,6 +31,8 @@ iostream
 -
 cv.hpp
 /home/jun/SSD_SLAM/src/klt/cv.hpp
+convolve.hpp
+/home/jun/SSD_SLAM/src/klt/convolve.hpp
 
 /home/jun/SSD_SLAM/src/klt/kltTrackingContext.h
 iostream

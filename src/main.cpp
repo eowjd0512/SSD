@@ -23,9 +23,16 @@ bool initialization = false;
 void DrawTrackingPoints(vector<kltFeature> featurelist, Mat &image){
   /// Draw corners detected
     for(int i = 0; i < featurelist.size(); i++){ 
-      int x= cvRound(featurelist[i].pt.x);
-      int y= cvRound(featurelist[i].pt.y);
-      circle( image, Point(x,y), 3, Scalar(255,0,0),2 );}
+      if (featurelist[i].status == 0){
+        int x= cvRound(featurelist[i].pt.x);
+        int y= cvRound(featurelist[i].pt.y);
+        circle( image, Point(x,y), 3, Scalar(0,0,255),2 );
+      }else if  (featurelist[i].status == 1) {
+        int x= cvRound(featurelist[i].pt.x);
+        int y= cvRound(featurelist[i].pt.y);
+        circle( image, Point(x,y), 3, Scalar(255,0,0),2 );
+      }
+    }
 
 }
 int main (int argc, char *argv[])
@@ -45,11 +52,11 @@ int main (int argc, char *argv[])
   int blockSize = 3;
   bool useHarrisDetector = false;
   double k = 0.04;
-  int maxCorners = 200;
+  int maxCorners = 500;
 
   KLTtracker kltTracker(maxCorners);
   kltTracker.tracker.sequentialMode = true;
-
+ 
   //TermCriteria criteria=TermCriteria(TermCriteria::COUNT+TermCriteria::EPS,10,0.01);
   Size winSize(11,11);
 
@@ -64,6 +71,8 @@ int main (int argc, char *argv[])
   
   vector<kltFeature> prevFeaturelist;
   vector<kltFeature> currFeaturelist;
+  prevFeaturelist.reserve(maxCorners);
+  currFeaturelist.reserve(maxCorners);
   for(;;){
     
     cap>>frame;
@@ -138,7 +147,7 @@ int main (int argc, char *argv[])
   int blockSize = 3;
   bool useHarrisDetector = false;
   double k = 0.04;
-  int maxCorners = 2000;
+  int maxCorners = 500;
 
   TermCriteria criteria=TermCriteria(TermCriteria::COUNT+TermCriteria::EPS,10,0.01);
   Size winSize(11,11);
@@ -175,8 +184,8 @@ int main (int argc, char *argv[])
       //currPoints = prevPoints; //for OPTFLOW_USE_INITIAL_FLOW
       calcOpticalFlowPyrLK(prevPyr,currPyr,prevPoints,currPoints,status,err,winSize);
 
-      /*//delete invalid correspondinig points
-      for(int i=0;i<prevPoints.size();i++){
+      //delete invalid correspondinig points
+      /*for(int i=0;i<prevPoints.size();i++){
         if(!status.at<uchar>(i)){
           prevPoints.erase(prevPoints.begin()+i);
           currPoints.erase(currPoints.begin()+i);

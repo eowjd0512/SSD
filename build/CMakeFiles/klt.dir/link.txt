@@ -1,2 +1,2 @@
-/usr/bin/ar qc libklt.a  CMakeFiles/klt.dir/src/klt/klt.cpp.o CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o
+/usr/bin/ar qc libklt.a  CMakeFiles/klt.dir/src/klt/klt.cpp.o CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o CMakeFiles/klt.dir/src/klt/convolve.cpp.o
 /usr/bin/ranlib libklt.a

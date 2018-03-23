@@ -1,7 +1,7 @@
 #include <iostream>
 #include "cv.hpp"
 #include "klt.h"
-
+//#include "convolve.hpp"
 using namespace cv;
 
 namespace klt{
@@ -106,6 +106,7 @@ namespace klt{
         //unsigned char *featuremap; /* Boolean array recording proximity of features */
         int *ptr;
         int mindist = this->tracker.mindist; 
+        int nfeature = this->nfeatures ;
         /* Cannot add features with an eigenvalue less than one */
         if (this->tracker.min_eigenvalue < 1)  this->tracker.min_eigenvalue = 1;
 
@@ -118,7 +119,7 @@ namespace klt{
         mindist--;
         /* If we are keeping all old good features, then add them to the featuremap */
         if (!overwriteAllFeatures)
-            for (indx = 0 ; indx < this->nfeatures ; indx++)
+            for (indx = 0 ; indx < nfeature; indx++)
             if (fl[indx].val >= 0)  {
                 x   = (int) fl[indx].pt.x;
                 y   = (int) fl[indx].pt.y;
@@ -131,7 +132,7 @@ namespace klt{
             /* If we can't add all the points, then fill in the rest
             of the featurelist with -1's */
             if (ptr >= pointlist + 3*npoints)  {
-            while (indx < this->nfeatures)  {	
+            while (indx < nfeature)  {	
                 if (overwriteAllFeatures || 
                     fl[indx].val < 0) {
                 fl[indx].pt.x   = -1;
@@ -163,11 +164,11 @@ namespace klt{
             assert(y < rows);
             
             while (!overwriteAllFeatures && 
-                indx < this->nfeatures &&
+                indx < nfeature &&
                 fl[indx].val >= 0)
             indx++;
 
-            if (indx >= this->nfeatures)  break;
+            if (indx >= nfeature)  break;
 
             /* If no neighbor has been selected, and if the minimum
             eigenvalue is large enough, then add feature to the current list */
@@ -217,6 +218,9 @@ namespace klt{
         window_hh = this->tracker.window_height/2;
         int nrows = Img.rows;
         int ncols = Img.cols;
+        convolution conv;
+        float sigma = (this->tracker.smooth_sigma_fact * max(this->tracker.window_width, this->tracker.window_height));
+            
         /* Create pointlist, which is a simplified version of a featurelist, */
          /* for speed.  Contains only integer locations and values. */
         //vector<int> pointlist;
@@ -238,17 +242,22 @@ namespace klt{
             //tmpimg = _KLTCreateFloatImage(ncols, nrows);
             //_KLTToFloatImage(img, ncols, nrows, tmpimg);
             int ksize = this->tracker.window_width;
-            float sigma = (this->tracker.smooth_sigma_fact * max(this->tracker.window_width, this->tracker.window_height));
             GaussianBlur(Img,floatimg,Size(ksize,ksize),sigma);
-            //_KLTComputeSmoothedImage(tmpimg, _KLTComputeSmoothSigma(tc), floatimg);
+            //conv._KLTComputeSmoothedImage(floatimg, sigma, floatimg);
             //_KLTFreeFloatImage(tmpimg);
             } else
                 //KLTToFloatImage(img, ncols, nrows, floatimg);
                 floatimg = Img;
-            /* Compute gradient of image in x and y direction */
-            //_KLTComputeGradients(floatimg, tc->grad_sigma, gradx, grady);
+            /* Compute gradient of image in x and ys direction */
+           
+            //Mat gradx = Mat::zeros(floatimg.rows,floatimg.cols,CV_32FC1);
+            //Mat grady = Mat::zeros(floatimg.rows,floatimg.cols,CV_32FC1);
+            //conv._KLTComputeGradients(floatimg, sigma, gradx, grady);
+            
             Sobel(floatimg, gradx,-1,1,0,3);
+            gradx = gradx/9;
             Sobel(floatimg, grady,-1,0,1,3);
+            grady = grady/9;
             //imwrite("/home/jun/SSD_SLAM/debug/gradx.jpg", gradx);
             //imwrite("/home/jun/SSD_SLAM/debug/grady.jpg", grady);
             {
@@ -262,6 +271,7 @@ namespace klt{
             int bordery = this->tracker.bordery;	/* lost by convolution */
             int x, y;
             int i;
+            int skipPixel = this->tracker.nSkippedPixels;
             
             if (borderx < window_hw)  borderx = window_hw;
             if (bordery < window_hh)  bordery = window_hh;
@@ -271,8 +281,8 @@ namespace klt{
             /* For most of the pixels in the image, do ... */
             ptr = pointlist;
 
-            for (y = bordery ; y < nrows - bordery ; y += this->tracker.nSkippedPixels + 1)
-            for (x = borderx ; x < ncols - borderx ; x += this->tracker.nSkippedPixels + 1)  {
+            for (y = bordery ; y < nrows - bordery ; y += skipPixel+ 1)
+            for (x = borderx ; x < ncols - borderx ; x += skipPixel + 1)  {
                 /* Sum the gradients in the surrounding window */
                 gxx = 0;  gxy = 0;  gyy = 0;
                 for (yy = y-window_hh ; yy <= y+window_hh ; yy++)

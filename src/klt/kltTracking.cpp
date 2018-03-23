@@ -1,7 +1,7 @@
 #include <iostream>
 #include "cv.hpp"
 #include "klt.h"
-#include "convolve.cpp"
+#include "convolve.hpp"
 #include <vector>
 #include <string>
 using namespace std;
@@ -297,22 +297,25 @@ namespace klt{
     }
     vector<Mat> _KLTComputeGradients(vector<Mat> pyramid1, int x, int y,int ksize, float sigma){
         vector<Mat> grad;
+        convolution conv;
         for (int i=0; i<pyramid1.size();i++){
             Mat grad_ = Mat::zeros(pyramid1[i].rows,pyramid1[i].cols,CV_32FC1);
 
             GaussianBlur(pyramid1[i],pyramid1[i],Size(ksize,ksize),sigma);
-            //_KLTComputeSmoothedImage(pyramid1[i], sigma, pyramid1[i]);
+            //conv._KLTComputeSmoothedImage(pyramid1[i], sigma, pyramid1[i]);
 		
-            if (fabs(sigma - sigma_last) > 0.05)
-                _computeKernels(sigma, &gauss_kernel, &gaussderiv_kernel);
+            //if (fabs(sigma - conv.sigma_last) > 0.05)
+                //conv._computeKernels(sigma, &conv.gauss_kernel, &conv.gaussderiv_kernel);
             //cout<<"3"<<endl;
-            if(x==1 && y==0){
-            _convolveSeparate(pyramid1[i], gaussderiv_kernel, gauss_kernel, grad_);
-            }else if(x==0, y==1)
-            _convolveSeparate(pyramid1[i], gauss_kernel, gaussderiv_kernel, grad_);
+            //if(x==1 && y==0){
+            //conv._convolveSeparate(pyramid1[i], conv.gaussderiv_kernel, conv.gauss_kernel, grad_);
+            //}else if(x==0, y==1)
+            //conv._convolveSeparate(pyramid1[i], conv.gauss_kernel, conv.gaussderiv_kernel, grad_);
 
             //cout<<"4"<<endl;
-            //Sobel(pyramid1[i], grad_,-1,x,y,3);
+            Sobel(pyramid1[i], grad_,-1,x,y,3);
+            grad_ = grad_/9;
+            //convertScaleAbs( grad_, grad_);
             //imwrite("/home/jun/SSD_SLAM/debug/grad.jpg", grad_);
             grad.push_back(grad_);
         }
@@ -354,9 +357,10 @@ namespace klt{
             status = KLT_OOB;
             break;
             }
-
+            
             /* Compute gradient and difference windows */
             if (lighting_insensitive) {
+                
             _computeIntensityDifferenceLightingInsensitive(img1, img2, x1, y1, *x2, *y2, 
                                         width, height, imgdiff);
             _computeGradientSumLightingInsensitive(gradx1, grady1, gradx2, grady2, 
@@ -427,6 +431,8 @@ namespace klt{
         int indx, r;
         bool floatimg1_created = false;
         int i;
+        float sigma = (this->tracker.smooth_sigma_fact * max(this->tracker.window_width, this->tracker.window_height));
+        int ksize = this->tracker.window_width;
         /*
         if (KLT_verbose >= 1)  {
             fprintf(stderr,  "(KLT) Tracking %d features in a %d by %d image...  ",
@@ -434,7 +440,7 @@ namespace klt{
             fflush(stderr);
         }*/
 
-        /* Check window size (and correct if necessary) */
+        /* Check window size (and correct if necessary) 
         if (this->tracker.window_width % 2 != 1) {
             this->tracker.window_width = this->tracker.window_width+1;
         }
@@ -446,7 +452,7 @@ namespace klt{
         }
         if (this->tracker.window_height < 3) {
             this->tracker.window_height = 3;
-        }
+        }*/
         /* Create temporary image */
         //tmpimg = _KLTCreateFloatImage(ncols, nrows);
 
@@ -463,8 +469,7 @@ namespace klt{
         } else  {
             //floatimg1_created = TRUE;
             prevImg.convertTo(floatimg1, CV_32FC1);
-            int ksize = this->tracker.window_width;
-            float sigma = (this->tracker.smooth_sigma_fact * max(this->tracker.window_width, this->tracker.window_height));
+            
             GaussianBlur(floatimg1,floatimg1,Size(ksize,ksize),sigma);
             //_KLTComputeSmoothedImage(floatimg1, sigma, floatimg1);
 		
@@ -475,8 +480,7 @@ namespace klt{
         }
         /* Do the same thing with second image */
         currImg.convertTo(floatimg2, CV_32FC1);
-        int ksize = this->tracker.window_width;
-        float sigma = (this->tracker.smooth_sigma_fact * max(this->tracker.window_width, this->tracker.window_height));
+        
         GaussianBlur(floatimg2,floatimg2,Size(ksize,ksize),sigma);
         //_KLTComputeSmoothedImage(floatimg2, sigma, floatimg2);
 		
@@ -489,7 +493,7 @@ namespace klt{
         if (1)  {
             //char fname[80];
             string s[5] = {"a","b","c","d","e"};
-            for (i = 0 ; i < this->tracker.nPyramidLevels ; i++)  {
+            for (i = 0 ; i < MaxPyLevel ; i++)  {
                 //sprintf(fname, "kltimg_tf_i%d.pgm", i);
                 imwrite("/home/jun/SSD_SLAM/debug/pyr1"+ s[i] +".jpg", pyramid1[i]);
                 imwrite("/home/jun/SSD_SLAM/debug/pyr1_gradx"+ s[i] +".jpg",  pyramid1_gradx[i]);
@@ -533,12 +537,13 @@ namespace klt{
                     if (val==KLT_SMALL_DET || val==KLT_OOB)
                         break;
                 }
-                cout<<"val: "<<val<<endl;
+                //cout<<"val: "<<val<<endl;
                 /* Record feature */
                 if (val == KLT_OOB) {
                     currfl[indx].pt.x   = -1.0;
                     currfl[indx].pt.y   = -1.0;
                     currfl[indx].val = KLT_OOB;
+                    currfl[indx].status = -1;
                     if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
                     if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
                     if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
@@ -547,6 +552,7 @@ namespace klt{
                     currfl[indx].pt.x   = -1.0;
                     currfl[indx].pt.y   = -1.0;
                     currfl[indx].val = KLT_OOB;
+                    currfl[indx].status = -1;
                     if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
                     if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
                     if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
@@ -555,6 +561,7 @@ namespace klt{
                     currfl[indx].pt.x   = -1.0;
                     currfl[indx].pt.y   = -1.0;
                     currfl[indx].val = KLT_SMALL_DET;
+                    currfl[indx].status = -1;
                     if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
                     if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
                     if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
@@ -563,14 +570,16 @@ namespace klt{
                     currfl[indx].pt.x   = -1.0;
                     currfl[indx].pt.y   = -1.0;
                     currfl[indx].val = KLT_LARGE_RESIDUE;
+                    currfl[indx].status = -1;
                     if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
                     if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
                     if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
                 }
                  else if (val == KLT_MAX_ITERATIONS)  {
-                    currfl[indx].pt.x   = -1.0;
-                    currfl[indx].pt.y   = -1.0;
-                    currfl[indx].val = KLT_MAX_ITERATIONS;
+                    currfl[indx].pt.x = xlocout;
+                    currfl[indx].pt.y  = ylocout;
+                    currfl[indx].val  = KLT_TRACKED;
+                    currfl[indx].status = 0;
                     if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
                     if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
                     if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
@@ -578,6 +587,7 @@ namespace klt{
                     currfl[indx].pt.x = xlocout;
                     currfl[indx].pt.y  = ylocout;
                     currfl[indx].val  = KLT_TRACKED;
+                    currfl[indx].status = 1;
                     if (this->tracker.affineConsistencyCheck >= 0 && val == KLT_TRACKED)  { /*for affine mapping*/
                         int border = 2; /* add border for interpolation */
 

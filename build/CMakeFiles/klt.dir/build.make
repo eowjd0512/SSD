@@ -129,11 +129,36 @@ CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o.provides: CMakeFiles/klt.dir/src/kl
 CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o.provides.build: CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o
 
 
+CMakeFiles/klt.dir/src/klt/convolve.cpp.o: CMakeFiles/klt.dir/flags.make
+CMakeFiles/klt.dir/src/klt/convolve.cpp.o: ../src/klt/convolve.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/jun/SSD_SLAM/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/klt.dir/src/klt/convolve.cpp.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/klt.dir/src/klt/convolve.cpp.o -c /home/jun/SSD_SLAM/src/klt/convolve.cpp
+
+CMakeFiles/klt.dir/src/klt/convolve.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/klt.dir/src/klt/convolve.cpp.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jun/SSD_SLAM/src/klt/convolve.cpp > CMakeFiles/klt.dir/src/klt/convolve.cpp.i
+
+CMakeFiles/klt.dir/src/klt/convolve.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/klt.dir/src/klt/convolve.cpp.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jun/SSD_SLAM/src/klt/convolve.cpp -o CMakeFiles/klt.dir/src/klt/convolve.cpp.s
+
+CMakeFiles/klt.dir/src/klt/convolve.cpp.o.requires:
+
+.PHONY : CMakeFiles/klt.dir/src/klt/convolve.cpp.o.requires
+
+CMakeFiles/klt.dir/src/klt/convolve.cpp.o.provides: CMakeFiles/klt.dir/src/klt/convolve.cpp.o.requires
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/convolve.cpp.o.provides.build
+.PHONY : CMakeFiles/klt.dir/src/klt/convolve.cpp.o.provides
+
+CMakeFiles/klt.dir/src/klt/convolve.cpp.o.provides.build: CMakeFiles/klt.dir/src/klt/convolve.cpp.o
+
+
 # Object files for target klt
 klt_OBJECTS = \
 "CMakeFiles/klt.dir/src/klt/klt.cpp.o" \
 "CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o" \
-"CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o"
+"CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o" \
+"CMakeFiles/klt.dir/src/klt/convolve.cpp.o"
 
 # External object files for target klt
 klt_EXTERNAL_OBJECTS =
@@ -141,9 +166,10 @@ klt_EXTERNAL_OBJECTS =
 libklt.a: CMakeFiles/klt.dir/src/klt/klt.cpp.o
 libklt.a: CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o
 libklt.a: CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o
+libklt.a: CMakeFiles/klt.dir/src/klt/convolve.cpp.o
 libklt.a: CMakeFiles/klt.dir/build.make
 libklt.a: CMakeFiles/klt.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/jun/SSD_SLAM/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX static library libklt.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/jun/SSD_SLAM/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX static library libklt.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/klt.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/klt.dir/link.txt --verbose=$(VERBOSE)
 
@@ -155,6 +181,7 @@ CMakeFiles/klt.dir/build: libklt.a
 CMakeFiles/klt.dir/requires: CMakeFiles/klt.dir/src/klt/klt.cpp.o.requires
 CMakeFiles/klt.dir/requires: CMakeFiles/klt.dir/src/klt/kltTrackingContext.cpp.o.requires
 CMakeFiles/klt.dir/requires: CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o.requires
+CMakeFiles/klt.dir/requires: CMakeFiles/klt.dir/src/klt/convolve.cpp.o.requires
 
 .PHONY : CMakeFiles/klt.dir/requires
 

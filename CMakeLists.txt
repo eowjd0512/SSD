@@ -27,7 +27,7 @@ set(klt_SOURCE_FILES
   ${PROJECT_SOURCE_DIR}/src/klt/klt.cpp
   ${PROJECT_SOURCE_DIR}/src/klt/kltTrackingContext.cpp
   ${PROJECT_SOURCE_DIR}/src/klt/kltTracking.cpp
-#  ${PROJECT_SOURCE_DIR}/thirdParty/klt/klt_util.c
+  ${PROJECT_SOURCE_DIR}/src/klt/convolve.cpp
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/pyramid.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/selectGoodFeatures.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/storeFeatures.c

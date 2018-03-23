@@ -3,6 +3,7 @@
 #include "cv.hpp"
 #include "kltFeature.h"
 #include "kltTrackingContext.h"
+#include "convolve.hpp"
 #include <vector>
 
 using namespace cv;

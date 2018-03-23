@@ -67,7 +67,7 @@ class kltTrackingContext{
         sequentialMode = true;
         smoothBeforeSelecting = true;
         writeInternalImages = true;
-        lighting_insensitive = true;
+        lighting_insensitive = false;
         min_eigenvalue = 1;
         min_determinant = 0.01f;
         max_iterations = 10;

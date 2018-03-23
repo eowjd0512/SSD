@@ -533,6 +533,33 @@ ContinuousUpdate/fast:
 	$(MAKE) -f CMakeFiles/ContinuousUpdate.dir/build.make CMakeFiles/ContinuousUpdate.dir/build
 .PHONY : ContinuousUpdate/fast
 
+src/klt/convolve.o: src/klt/convolve.cpp.o
+
+.PHONY : src/klt/convolve.o
+
+# target to build an object file
+src/klt/convolve.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/convolve.cpp.o
+.PHONY : src/klt/convolve.cpp.o
+
+src/klt/convolve.i: src/klt/convolve.cpp.i
+
+.PHONY : src/klt/convolve.i
+
+# target to preprocess a source file
+src/klt/convolve.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/convolve.cpp.i
+.PHONY : src/klt/convolve.cpp.i
+
+src/klt/convolve.s: src/klt/convolve.cpp.s
+
+.PHONY : src/klt/convolve.s
+
+# target to generate assembly for a file
+src/klt/convolve.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/klt/convolve.cpp.s
+.PHONY : src/klt/convolve.cpp.s
+
 src/klt/klt.o: src/klt/klt.cpp.o
 
 .PHONY : src/klt/klt.o
@@ -682,6 +709,9 @@ help:
 	@echo "... ExperimentalSubmit"
 	@echo "... ContinuousStart"
 	@echo "... ContinuousUpdate"
+	@echo "... src/klt/convolve.o"
+	@echo "... src/klt/convolve.i"
+	@echo "... src/klt/convolve.s"
 	@echo "... src/klt/klt.o"
 	@echo "... src/klt/klt.i"
 	@echo "... src/klt/klt.s"
