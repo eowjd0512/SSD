@@ -66,30 +66,67 @@ int getIdxForRF(float x){
     int idx= int(x/255.0*1024);
     return idx;
 }
+float JointRadiometicCalib::getRF_Value(int idx){
+    int M = this->M;
+    float val = this->g0[idx];
+    for(int i=0; i<M;i++){
+        val+=this->h[i][idx]*this->c[i];
+    }
+    return val;
+}
+float JointRadiometicCalib::getRF_DerivValue(int idx){
+    int M = this->M;
+    float val = this->g0_[idx];
+    for(int i=0; i<M;i++){
+        val+=this->h_[i][idx]*this->c[i];
+    }
+    return val;
+}
+float JointRadiometicCalib::get_beta(int x, int y, Mat J_origin, Mat I_origin){
+    float J_irr = J_origin.at<float>(y,x);
+    float I_irr = I_origin.at<float>(y,x);
+    int J_idx= getIdxForRF(J_irr);
+    int I_idx= getIdxForRF(I_irr);
+    float g_J = getRF_Value(J_idx);
+    float g_I = getRF_Value(I_idx);
+    float beta = g_J-g_I;
+    return beta;
+}
+
 float JointRadiometicCalib::get_a(int x, int y, float g0_[], Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx){
-    
-    if(this->trackingMode==1){
     float J_irr = J_origin.at<float>(y,x);
     float I_irr = I_origin.at<float>(y,x);
     float J_grad = J_gradx.at<float>(y,x);
     float I_grad = I_gradx.at<float>(y,x);
     int J_idx= getIdxForRF(J_irr);
     int I_idx= getIdxForRF(I_irr);
-    float a = (g0_[J_idx]*J_grad + g0_[I_idx]*I_grad)/2;
-    return a;
+    if(this->trackingMode==0){
+        float g_J = getRF_DerivValue(J_idx);
+        float g_I = getRF_DerivValue(I_idx);
+        float a = g_J*J_grad-g_I*I_grad;
+        return a;
+    }
+    else if(this->trackingMode==1){
+        float a = (g0_[J_idx]*J_grad + g0_[I_idx]*I_grad)/2;
+        return a;
     }
 }
 float JointRadiometicCalib::get_b(int x, int y,float g0_[], Mat J_origin, Mat I_origin,Mat J_grady, Mat I_grady){
-    
-    if(this->trackingMode==1){
     float J_irr = J_origin.at<float>(y,x);
     float I_irr = I_origin.at<float>(y,x);
     float J_grad = J_grady.at<float>(y,x);
     float I_grad = I_grady.at<float>(y,x);
     int J_idx= getIdxForRF(J_irr);
     int I_idx= getIdxForRF(I_irr);
-    float b = (g0_[J_idx]*J_grad + g0_[I_idx]*I_grad)/2;
-    return b;
+    if(this->trackingMode==0){
+        float g_J = getRF_DerivValue(J_idx);
+        float g_I = getRF_DerivValue(I_idx);
+        float b = g_J*J_grad-g_I*I_grad;
+        return b;
+    }
+    else if(this->trackingMode==1){
+        float b = (g0_[J_idx]*J_grad + g0_[I_idx]*I_grad)/2;
+        return b;
     }
 }
 float JointRadiometicCalib::get_r_k(int x, int y, float h[], Mat J_origin, Mat I_origin){
@@ -128,5 +165,12 @@ float JointRadiometicCalib::get_d(int x, int y, float g0[],Mat J_origin, Mat I_o
     float d = g0[J_idx]-g0[I_idx];
     return d;
 }
-
+int JointRadiometicCalib::trackingKnownRF(float x1, float y1, float *x2, float *y2,
+                      Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2){
+                        
+                      }
+int JointRadiometicCalib::trackingUnknownRF(float x1, float y1, float *x2, float *y2,
+                      Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2){
+                          
+                      }
 }

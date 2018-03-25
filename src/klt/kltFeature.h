@@ -20,6 +20,17 @@ class kltFeature{
     float aff_Axy;
     float aff_Ayy;
     int status;
+
+    //for JRC
+    float a;
+    float b;
+    float beta;
+    //for unknown Response Function
+    float r[3];
+    float p[3];
+    float q[3];
+    float d;
+    
     kltFeature(){}
     ~kltFeature(){}
 };

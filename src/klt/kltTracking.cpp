@@ -4,9 +4,9 @@
 #include "convolve.hpp"
 #include <vector>
 #include <string>
+//#include "../JointRadiometicCalib/JRC.hpp"
 using namespace std;
 using namespace cv;
-
 namespace klt{
 
     static float _interpolate(
@@ -676,5 +676,194 @@ namespace klt{
          //   fflush(stderr);
         //}
         
+    }
+
+    void KLTtracker::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<kltFeature> prevfl, vector<kltFeature> &currfl){
+        Mat tmpimg, floatimg1, floatimg2;
+        currfl=prevfl;
+        //int MaxPyLevel = 3;
+        int MaxPyLevel = this->tracker.nPyramidLevels;
+        vector<Mat> pyramid1, pyramid1_gradx, pyramid1_grady,
+            pyramid2, pyramid2_gradx, pyramid2_grady;
+        float subsampling = (float) this->tracker.subsampling;
+        //float subsampling =2.0;
+        float xloc, yloc, xlocout, ylocout;
+        int val;
+        int indx, r;
+        bool floatimg1_created = false;
+        int i;
+        float sigma = (this->tracker.smooth_sigma_fact * max(this->tracker.window_width, this->tracker.window_height));
+        int ksize = this->tracker.window_width;
+        
+        /* Process first image by converting to float, smoothing, computing */
+        /* pyramid, and computing gradient pyramids */
+        if (this->tracker.sequentialMode && !this->tracker.pyramid_last.empty())  {
+            pyramid1 = this->tracker.pyramid_last;
+            pyramid1_gradx = this->tracker.pyramid_last_gradx;
+            pyramid1_grady = this->tracker.pyramid_last_grady;
+            if (pyramid1[0].cols != prevImg.cols || pyramid1[0].rows != prevImg.rows)
+                cerr<<"(KLTTrackFeatures) Size of incoming image is different from size of previous image"<<endl; 
+            assert(!pyramid1_gradx.empty());
+            assert(!pyramid1_grady.empty());
+        } else  {
+            //floatimg1_created = TRUE;
+            prevImg.convertTo(floatimg1, CV_32FC1);
+            
+            GaussianBlur(floatimg1,floatimg1,Size(ksize,ksize),sigma);
+            //_KLTComputeSmoothedImage(floatimg1, sigma, floatimg1);
+		
+            pyramid1 = _KLTCreatePyramid(floatimg1, (int) subsampling, MaxPyLevel);
+            //_KLTComputePyramid(floatimg1, pyramid1, tc->pyramid_sigma_fact);
+            pyramid1_gradx = _KLTComputeGradients(pyramid1, 1,0,ksize,this->tracker.grad_sigma);
+            pyramid1_grady = _KLTComputeGradients(pyramid1, 0,1,ksize,this->tracker.grad_sigma);
+        }
+        /* Do the same thing with second image */
+        currImg.convertTo(floatimg2, CV_32FC1);
+        
+        GaussianBlur(floatimg2,floatimg2,Size(ksize,ksize),sigma);
+        //_KLTComputeSmoothedImage(floatimg2, sigma, floatimg2);
+		
+        pyramid2 = _KLTCreatePyramid(floatimg2, (int) subsampling, MaxPyLevel);
+        //_KLTComputePyramid(floatimg1, pyramid1, tc->pyramid_sigma_fact);
+        pyramid2_gradx = _KLTComputeGradients(pyramid2, 1,0,ksize,this->tracker.grad_sigma);
+        pyramid2_grady = _KLTComputeGradients(pyramid2, 0,1,ksize,this->tracker.grad_sigma);
+        
+        /* Write internal images */
+        if (0)  {
+            //char fname[80];
+            string s[5] = {"a","b","c","d","e"};
+            for (i = 0 ; i < MaxPyLevel ; i++)  {
+                //sprintf(fname, "kltimg_tf_i%d.pgm", i);
+                imwrite("/home/jun/SSD_SLAM/debug/pyr1"+ s[i] +".jpg", pyramid1[i]);
+                imwrite("/home/jun/SSD_SLAM/debug/pyr1_gradx"+ s[i] +".jpg",  pyramid1_gradx[i]);
+                imwrite("/home/jun/SSD_SLAM/debug/pyr1_grady"+ s[i] +".jpg",  pyramid1_grady[i]);
+                imwrite("/home/jun/SSD_SLAM/debug/pyr2"+ s[i] +".jpg", pyramid2[i]);
+                imwrite("/home/jun/SSD_SLAM/debug/pyr2_gradx"+ s[i] +".jpg",  pyramid2_gradx[i]);
+                imwrite("/home/jun/SSD_SLAM/debug/pyr2_grady"+ s[i] +".jpg",  pyramid2_grady[i]);
+                
+            }
+        }
+        JRC::JointRadiometicCalib jrc;
+        /* if  JRC -> trackingMode  ==  known RF   */
+        // 1.  create  U, w, lamda, v, m for all featurs
+
+
+        // 2. calculate K by all featurs
+
+
+        // 3.  calculate each dx, dy with respect to each feature 
+
+        /* if  JRC -> trackingMode  ==  un known RF   */
+
+        // 1.  create  U, w, lamda, v, m for all featurs
+
+
+        // 2. calculate K by all featurs
+
+
+        // 3.  calculate each dx, dy with respect to each feature 
+
+
+        /* For each feature, do ... */
+        for (indx = 0 ; indx < this->nfeatures ; indx++)  {
+
+            /* Only track features that are not lost */
+            if (prevfl[indx].val >= 0)  {
+
+                xloc = prevfl[indx].pt.x;
+                yloc = prevfl[indx].pt.y;
+
+                /* Transform location to coarsest resolution */
+                for (r = MaxPyLevel - 1 ; r >= 0 ; r--)  {
+                    xloc /= subsampling;  yloc /= subsampling;
+                }
+                xlocout = xloc;  ylocout = yloc;
+
+                /* Beginning with coarsest resolution, do ... */
+                for (r = MaxPyLevel - 1 ; r >= 0 ; r--)  {
+
+                    /* Track feature at current resolution */
+                    xloc *= subsampling;  yloc *= subsampling;
+                    xlocout *= subsampling;  ylocout *= subsampling;
+
+                    val = _trackFeature(xloc, yloc, 
+                        &xlocout, &ylocout,
+                        pyramid1[r], 
+                        pyramid1_gradx[r], pyramid1_grady[r], 
+                        pyramid2[r], 
+                        pyramid2_gradx[r], pyramid2_grady[r]);
+
+                    if (val==KLT_SMALL_DET || val==KLT_OOB)
+                        break;
+                }
+                //cout<<"val: "<<val<<endl;
+                /* Record feature */
+                if (val == KLT_OOB) {
+                    currfl[indx].pt.x   = -1.0;
+                    currfl[indx].pt.y   = -1.0;
+                    currfl[indx].val = KLT_OOB;
+                    currfl[indx].status = -1;
+                    if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
+                    if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
+                    if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
+                } 
+                else if (_outOfBounds(xlocout, ylocout, currImg.cols, currImg.rows, this->tracker.borderx, this->tracker.bordery))  {
+                    currfl[indx].pt.x   = -1.0;
+                    currfl[indx].pt.y   = -1.0;
+                    currfl[indx].val = KLT_OOB;
+                    currfl[indx].status = -1;
+                    if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
+                    if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
+                    if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
+                }
+                 else if (val == KLT_SMALL_DET)  {
+                    currfl[indx].pt.x   = -1.0;
+                    currfl[indx].pt.y   = -1.0;
+                    currfl[indx].val = KLT_SMALL_DET;
+                    currfl[indx].status = -1;
+                    if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
+                    if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
+                    if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
+                }
+                 else if (val == KLT_LARGE_RESIDUE)  {
+                    currfl[indx].pt.x   = -1.0;
+                    currfl[indx].pt.y   = -1.0;
+                    currfl[indx].val = KLT_LARGE_RESIDUE;
+                    currfl[indx].status = -1;
+                    if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
+                    if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
+                    if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
+                }
+                 else if (val == KLT_MAX_ITERATIONS)  {
+                    currfl[indx].pt.x = xlocout;
+                    currfl[indx].pt.y  = ylocout;
+                    currfl[indx].val  = KLT_TRACKED;
+                    currfl[indx].status = 0;
+                    if( !currfl[indx].aff_img.empty() ) currfl[indx].aff_img.release();
+                    if( !currfl[indx].aff_img_gradx.empty() ) currfl[indx].aff_img_gradx.release();
+                    if( !currfl[indx].aff_img_grady.empty() ) currfl[indx].aff_img_grady.release();
+                } else  {
+                    currfl[indx].pt.x = xlocout;
+                    currfl[indx].pt.y  = ylocout;
+                    currfl[indx].val  = KLT_TRACKED;
+                    currfl[indx].status = 1;
+                }
+            }
+        }
+
+        if (this->tracker.sequentialMode)  {
+            this->tracker.pyramid_last = pyramid2;
+            this->tracker.pyramid_last_gradx = pyramid2_gradx;
+            this->tracker.pyramid_last_grady = pyramid2_grady;
+        } else  {
+            pyramid2.clear();
+            pyramid2_gradx.clear();
+            pyramid2_grady.clear();
+        }
+
+        /* Free memory */
+        pyramid1.clear();
+        pyramid1_gradx.clear();
+        pyramid1_grady.clear();
     }
 }
