@@ -533,6 +533,33 @@ ContinuousUpdate/fast:
 	$(MAKE) -f CMakeFiles/ContinuousUpdate.dir/build.make CMakeFiles/ContinuousUpdate.dir/build
 .PHONY : ContinuousUpdate/fast
 
+src/JointRadiometicCalib/JRC.o: src/JointRadiometicCalib/JRC.cpp.o
+
+.PHONY : src/JointRadiometicCalib/JRC.o
+
+# target to build an object file
+src/JointRadiometicCalib/JRC.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/JRC.cpp.o
+.PHONY : src/JointRadiometicCalib/JRC.cpp.o
+
+src/JointRadiometicCalib/JRC.i: src/JointRadiometicCalib/JRC.cpp.i
+
+.PHONY : src/JointRadiometicCalib/JRC.i
+
+# target to preprocess a source file
+src/JointRadiometicCalib/JRC.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/JRC.cpp.i
+.PHONY : src/JointRadiometicCalib/JRC.cpp.i
+
+src/JointRadiometicCalib/JRC.s: src/JointRadiometicCalib/JRC.cpp.s
+
+.PHONY : src/JointRadiometicCalib/JRC.s
+
+# target to generate assembly for a file
+src/JointRadiometicCalib/JRC.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/JRC.cpp.s
+.PHONY : src/JointRadiometicCalib/JRC.cpp.s
+
 src/klt/convolve.o: src/klt/convolve.cpp.o
 
 .PHONY : src/klt/convolve.o
@@ -709,6 +736,9 @@ help:
 	@echo "... ExperimentalSubmit"
 	@echo "... ContinuousStart"
 	@echo "... ContinuousUpdate"
+	@echo "... src/JointRadiometicCalib/JRC.o"
+	@echo "... src/JointRadiometicCalib/JRC.i"
+	@echo "... src/JointRadiometicCalib/JRC.s"
 	@echo "... src/klt/convolve.o"
 	@echo "... src/klt/convolve.i"
 	@echo "... src/klt/convolve.s"

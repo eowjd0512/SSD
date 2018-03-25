@@ -6,6 +6,16 @@
 
 #IncludeRegexTransform: 
 
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/JRC.hpp
+cv.hpp
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/cv.hpp
+iostream
+-
+iostream
+-
+string
+-
+
 /home/jun/SSD_SLAM/src/klt/convolve.hpp
 iostream
 -
@@ -25,6 +35,8 @@ convolve.hpp
 /home/jun/SSD_SLAM/src/klt/convolve.hpp
 vector
 -
+../JointRadiometicCalib/JRC.hpp
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/JRC.hpp
 
 /home/jun/SSD_SLAM/src/klt/kltFeature.h
 iostream

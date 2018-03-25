@@ -21,14 +21,19 @@ include_directories(
 find_package(Eigen3 REQUIRED)
 #find_package(Boost COMPONENTS system thread) 
 find_package(OpenCV QUIET)
-
+# flags
+add_definitions("-DENABLE_SSE")
+set(CMAKE_CXX_FLAGS
+   "${SSE_FLAGS} -O3 -g -std=c++0x -march=native"
+#   "${SSE_FLAGS} -O3 -g -std=c++0x -fno-omit-frame-pointer"
+)
 
 set(klt_SOURCE_FILES
   ${PROJECT_SOURCE_DIR}/src/klt/klt.cpp
   ${PROJECT_SOURCE_DIR}/src/klt/kltTrackingContext.cpp
   ${PROJECT_SOURCE_DIR}/src/klt/kltTracking.cpp
   ${PROJECT_SOURCE_DIR}/src/klt/convolve.cpp
- # ${PROJECT_SOURCE_DIR}/thirdParty/klt/pyramid.c
+  ${PROJECT_SOURCE_DIR}/src/JointRadiometicCalib/JRC.cpp
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/selectGoodFeatures.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/storeFeatures.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/trackFeatures.c
@@ -56,5 +61,5 @@ if (OpenCV_FOUND)
     include_directories( ${OpenCV_INCLUDE_DIRS} )
     set(HAS_OPENCV 1)
     add_executable(SSDSLAM ${PROJECT_SOURCE_DIR}/src/main.cpp)
-    target_link_libraries(SSDSLAM klt ${OpenCV_LIBS})
+    target_link_libraries(SSDSLAM klt ${OpenCV_LIBS} ${Eigen3_LIBS})
 endif()

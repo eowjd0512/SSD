@@ -5,10 +5,11 @@
 #include "kltTrackingContext.h"
 #include "convolve.hpp"
 #include <vector>
-
+#include "../JointRadiometicCalib/JRC.hpp"
 using namespace cv;
 using namespace klt;
 using namespace std;
+using namespace JRC;
 namespace klt{
     
     #define KLT_TRACKED           0
@@ -21,6 +22,7 @@ namespace klt{
     class KLTtracker{
     public:
     kltTrackingContext tracker;
+    JointRadiometicCalib jrc;
     vector<kltFeature> featureList;
     int nfeatures;
     vector<Mat> prevPyr, currPyr;
@@ -32,6 +34,7 @@ namespace klt{
         this->tracker.writeInternalImages = false;
         this->tracker.affineConsistencyCheck = -1;  /* set this to 2 to turn on affine consistency check */
         this->nfeatures = nfeatures;
+        //jrc.setRFs();
     }
     void get_image();
     void createFeatureTable();

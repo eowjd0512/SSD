@@ -37,7 +37,7 @@ void DrawTrackingPoints(vector<kltFeature> featurelist, Mat &image){
 }
 int main (int argc, char *argv[])
 {
-  VideoCapture cap(0);
+  VideoCapture cap(1);
   if(!cap.isOpened()){
     cout<<"Cannot open cap"<<endl;
     return 0;
@@ -58,8 +58,6 @@ int main (int argc, char *argv[])
   kltTracker.tracker.sequentialMode = true;
  
   //TermCriteria criteria=TermCriteria(TermCriteria::COUNT+TermCriteria::EPS,10,0.01);
-  Size winSize(11,11);
-
   //vector<Point2f> prevPoints;
   //vector<Point2f> currPoints;
   //vector<Point2f> boundPoints;
