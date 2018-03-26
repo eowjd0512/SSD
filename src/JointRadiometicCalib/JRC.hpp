@@ -29,12 +29,13 @@ bool trackingMode; //0 : knownRF, 1: unknownRF
 JointRadiometicCalib(){setRFs(); trackingMode = 1; M=3;}
 ~JointRadiometicCalib(){}
 
+int getIdxForRF(float x);
 void setRFs();
 void setRFderivatives();
 float getRF_Value(int idx);
 float getRF_DerivValue(int idx);
-float get_a(int x,int y,float g0_[], Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx);
-float get_b(int x,int y,float g0_[], Mat J_origin, Mat I_origin,Mat J_gradY, Mat I_gradY);
+float get_a(int x,int y,float g0_[], Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx,bool JRCtrackingMode);
+float get_b(int x,int y,float g0_[], Mat J_origin, Mat I_origin,Mat J_gradY, Mat I_gradY,bool JRCtrackingMode);
 float get_beta(int x, int y, Mat J_origin, Mat I_origin);
 float get_r_k(int x, int y, float h[], Mat J_origin, Mat I_origin);
 float get_p_k(int x, int y, float h_[], Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx);
@@ -45,7 +46,7 @@ Eigen::MatrixXf get_U(int window_size, int x, int y, Mat J_origin, Mat I_origin,
 Eigen::MatrixXf get_w(int window_size, int x, int y, Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx, Mat J_grady, Mat I_grady,bool JRCtrackingMode);
 Eigen::VectorXf get_v(int window_size, int x, int y, Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx, Mat J_grady, Mat I_grady,bool JRCtrackingMode);
 Eigen::VectorXf get_z(bool JRCtrackingMode);
-Eigen::MatrixXf get_lamda(int window_size,bool JRCtrackingMode);
+Eigen::MatrixXf get_lamda(int window_size,int x, int y, Mat J_origin, Mat I_origin,bool JRCtrackingMode);
 Eigen::VectorXf get_m(int window_size, int x, int y, Mat J_origin, Mat I_origin,bool JRCtrackingMode);
 
 void blockAllMatrix(int numOfTrackFeature,Eigen::MatrixXf &Uinv_all,Eigen::MatrixXf &w_all,Eigen::VectorXf &v_all,Eigen::MatrixXf &lamda_all,Eigen::VectorXf &m_all, bool JRCtrackingMode);

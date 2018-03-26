@@ -750,8 +750,8 @@ namespace klt{
         Eigen::MatrixXf w_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*4);
         Eigen::VectorXf v_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*1);
         //Eigen::MatrixXf z_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*8);
-        Eigen::MatrixXf lamda_all = Eigen::MatrixXf::Zero(5,4);
-        Eigen::VectorXf m_all = Eigen::MatrixXf::Zero(5,1);
+        Eigen::MatrixXf lamda_all = Eigen::MatrixXf::Zero(4,4);
+        Eigen::VectorXf m_all = Eigen::MatrixXf::Zero(4,1);
         int numOfTrackFeature=0;
         for (indx = 0 ; indx < nfeature ; indx++)  {
             
