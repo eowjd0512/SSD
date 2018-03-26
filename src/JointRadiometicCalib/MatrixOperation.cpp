@@ -126,9 +126,9 @@ Eigen::VectorXf JointRadiometicCalib::get_m(int window_size, int x, int y, Mat J
 }
 float JointRadiometicCalib::get_K(kltFeature f,Eigen::MatrixXf Uinv_all,Eigen::MatrixXf w_all,Eigen::VectorXf v_all,Eigen::MatrixXf lamda_all,Eigen::VectorXf m_all,bool JRCtrackingMode){
     if (JRCtrackingMode ==0 ){ // known RF
-
-    }else if(JRCtrackingMode ==1){// unknown RF
         
+    }else if(JRCtrackingMode ==1){// unknown RF
+
     }
 }
 void JointRadiometicCalib::initialization(kltFeature f){
@@ -167,9 +167,9 @@ void JointRadiometicCalib::blockAllMatrix(int numOfTrackFeature,Eigen::MatrixXf 
 }
 
 void JointRadiometicCalib::constructAllMatrix(kltFeature f, int numOfTrackFeature, Eigen::MatrixXf &Uinv_all,Eigen::MatrixXf &w_all,Eigen::VectorXf &v_all,Eigen::MatrixXf &lamda_all,Eigen::VectorXf &m_all){
-    Uinv_all.block(numOfTrackFeature*f.U[0].rows, numOfTrackFeature*f.U[0].cols, f.U[0].rows, f.U[0].cols) = f.U[0].inverse();
-    w_all.block(numOfTrackFeature*f.w[0].rows, 0, f.w[0].rows, f.w[0].cols) = f.w[0];
-    v_all.block(numOfTrackFeature*f.v[0].rows, 0, f.v[0].rows, f.v[0].cols) = f.v[0];
+    Uinv_all.block(numOfTrackFeature*f.U[0].rows(), numOfTrackFeature*f.U[0].cols(), f.U[0].rows(), f.U[0].cols()) = f.U[0].inverse();
+    w_all.block(numOfTrackFeature*f.w[0].rows(), 0, f.w[0].rows(), f.w[0].cols()) = f.w[0];
+    v_all.block(numOfTrackFeature*f.v[0].rows(), 0, f.v[0].rows(), f.v[0].cols()) = f.v[0];
     //lamda and m adapt summation
     lamda_all += f.lamda[0];
     m_all += f.m[0];

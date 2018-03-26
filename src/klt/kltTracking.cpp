@@ -491,7 +491,7 @@ namespace klt{
         pyramid2_grady = _KLTComputeGradients(pyramid2, 0,1,ksize,this->tracker.grad_sigma);
         
         /* Write internal images */
-        if (1)  {
+        if (0)  {
             //char fname[80];
             string s[5] = {"a","b","c","d","e"};
             for (i = 0 ; i < MaxPyLevel ; i++)  {
