@@ -20,6 +20,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../thirdParty/klt"
   "/opt/ros/kinetic/include/opencv-3.3.1"
   "/opt/ros/kinetic/include/opencv-3.3.1/opencv"
+  "/usr/local/include/eigen3"
   )
 
 # Targets to which this target links.

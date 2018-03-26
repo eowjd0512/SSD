@@ -6,6 +6,7 @@
 #include "convolve.hpp"
 #include <vector>
 #include "../JointRadiometicCalib/JRC.hpp"
+
 using namespace cv;
 using namespace klt;
 using namespace std;
@@ -46,6 +47,8 @@ namespace klt{
     void trackFeatures(Mat prevImg, Mat currImg, vector<kltFeature> prevfl, vector<kltFeature> &currfl);
     void JRCtrackFeatures(Mat prevImg, Mat currImg, vector<kltFeature> prevfl, vector<kltFeature> &currfl);
     int _trackFeature(float x1, float y1, float *x2, float *y2,
+                      Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2);
+    int _JRCtrackFeature(float x1, float y1, float *x2, float *y2,
                       Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2);
     void replaceLostFeatures(Mat Img, vector<kltFeature> &fl);
 

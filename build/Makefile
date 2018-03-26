@@ -560,6 +560,33 @@ src/JointRadiometicCalib/JRC.cpp.s:
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/JRC.cpp.s
 .PHONY : src/JointRadiometicCalib/JRC.cpp.s
 
+src/JointRadiometicCalib/MatrixOperation.o: src/JointRadiometicCalib/MatrixOperation.cpp.o
+
+.PHONY : src/JointRadiometicCalib/MatrixOperation.o
+
+# target to build an object file
+src/JointRadiometicCalib/MatrixOperation.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/MatrixOperation.cpp.o
+.PHONY : src/JointRadiometicCalib/MatrixOperation.cpp.o
+
+src/JointRadiometicCalib/MatrixOperation.i: src/JointRadiometicCalib/MatrixOperation.cpp.i
+
+.PHONY : src/JointRadiometicCalib/MatrixOperation.i
+
+# target to preprocess a source file
+src/JointRadiometicCalib/MatrixOperation.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/MatrixOperation.cpp.i
+.PHONY : src/JointRadiometicCalib/MatrixOperation.cpp.i
+
+src/JointRadiometicCalib/MatrixOperation.s: src/JointRadiometicCalib/MatrixOperation.cpp.s
+
+.PHONY : src/JointRadiometicCalib/MatrixOperation.s
+
+# target to generate assembly for a file
+src/JointRadiometicCalib/MatrixOperation.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/MatrixOperation.cpp.s
+.PHONY : src/JointRadiometicCalib/MatrixOperation.cpp.s
+
 src/klt/convolve.o: src/klt/convolve.cpp.o
 
 .PHONY : src/klt/convolve.o
@@ -739,6 +766,9 @@ help:
 	@echo "... src/JointRadiometicCalib/JRC.o"
 	@echo "... src/JointRadiometicCalib/JRC.i"
 	@echo "... src/JointRadiometicCalib/JRC.s"
+	@echo "... src/JointRadiometicCalib/MatrixOperation.o"
+	@echo "... src/JointRadiometicCalib/MatrixOperation.i"
+	@echo "... src/JointRadiometicCalib/MatrixOperation.s"
 	@echo "... src/klt/convolve.o"
 	@echo "... src/klt/convolve.i"
 	@echo "... src/klt/convolve.s"

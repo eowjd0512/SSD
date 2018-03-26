@@ -18,7 +18,10 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/thirdParty/klt
 ) 
 
-find_package(Eigen3 REQUIRED)
+find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+if (TARGET Eigen3::Eigen)
+  # Use the imported target
+endif (TARGET Eigen3::Eigen)
 #find_package(Boost COMPONENTS system thread) 
 find_package(OpenCV QUIET)
 # flags
@@ -34,7 +37,7 @@ set(klt_SOURCE_FILES
   ${PROJECT_SOURCE_DIR}/src/klt/kltTracking.cpp
   ${PROJECT_SOURCE_DIR}/src/klt/convolve.cpp
   ${PROJECT_SOURCE_DIR}/src/JointRadiometicCalib/JRC.cpp
- # ${PROJECT_SOURCE_DIR}/thirdParty/klt/selectGoodFeatures.c
+  ${PROJECT_SOURCE_DIR}/src/JointRadiometicCalib/MatrixOperation.cpp
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/storeFeatures.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/trackFeatures.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/writeFeatures.c
@@ -61,5 +64,5 @@ if (OpenCV_FOUND)
     include_directories( ${OpenCV_INCLUDE_DIRS} )
     set(HAS_OPENCV 1)
     add_executable(SSDSLAM ${PROJECT_SOURCE_DIR}/src/main.cpp)
-    target_link_libraries(SSDSLAM klt ${OpenCV_LIBS} ${Eigen3_LIBS})
+    target_link_libraries(SSDSLAM klt ${OpenCV_LIBS} Eigen3::Eigen)
 endif()

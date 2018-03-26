@@ -6,5 +6,5 @@ CXX_FLAGS =  -O3 -g -std=c++0x -march=native -O3 -DNDEBUG
 
 CXX_DEFINES = -DENABLE_SSE
 
-CXX_INCLUDES = -I/home/jun/SSD_SLAM/build -I/home/jun/SSD_SLAM/src -I/home/jun/SSD_SLAM/thirdParty/klt -isystem /opt/ros/kinetic/include/opencv-3.3.1 -isystem /opt/ros/kinetic/include/opencv-3.3.1/opencv 
+CXX_INCLUDES = -I/home/jun/SSD_SLAM/build -I/home/jun/SSD_SLAM/src -I/home/jun/SSD_SLAM/thirdParty/klt -isystem /opt/ros/kinetic/include/opencv-3.3.1 -isystem /opt/ros/kinetic/include/opencv-3.3.1/opencv -isystem /usr/local/include/eigen3 
 

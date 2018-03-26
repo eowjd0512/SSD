@@ -1,8 +1,12 @@
+#pragma once
 #include <iostream>
 #include "cv.hpp"
 #include "convolve.hpp"
+#include "eigen3/Eigen/Dense"
+#include <vector>
+//#include "../JointRadiometicCalib/JRC.hpp"
 using namespace cv;
-
+using namespace std;
 namespace klt{
 class kltFeature{
     public:
@@ -20,18 +24,20 @@ class kltFeature{
     float aff_Axy;
     float aff_Ayy;
     int status;
-
+    bool used;
     //for JRC
-    float a;
-    float b;
-    float beta;
+
+    //vector for multi pyramid
+ 
     //for unknown Response Function
-    float r[3];
-    float p[3];
-    float q[3];
-    float d;
+    vector<Eigen::MatrixXf> U;
+    vector<Eigen::MatrixXf> w;
+    vector<Eigen::VectorXf> v;
+    vector<Eigen::VectorXf> z;
+    vector<Eigen::MatrixXf> lamda;
+    vector<Eigen::VectorXf> m;
     
-    kltFeature(){}
+    kltFeature(){ used = false;}
     ~kltFeature(){}
 };
 

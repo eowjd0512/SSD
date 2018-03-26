@@ -4,7 +4,8 @@
 #include "convolve.hpp"
 #include <vector>
 #include <string>
-//#include "../JointRadiometicCalib/JRC.hpp"
+#include "eigen3/Eigen/Dense"
+
 using namespace std;
 using namespace cv;
 namespace klt{
@@ -694,7 +695,7 @@ namespace klt{
         int i;
         float sigma = (this->tracker.smooth_sigma_fact * max(this->tracker.window_width, this->tracker.window_height));
         int ksize = this->tracker.window_width;
-        
+        int nfeature = this->nfeatures;
         /* Process first image by converting to float, smoothing, computing */
         /* pyramid, and computing gradient pyramids */
         if (this->tracker.sequentialMode && !this->tracker.pyramid_last.empty())  {
@@ -744,28 +745,39 @@ namespace klt{
             }
         }
         JRC::JointRadiometicCalib jrc;
-        /* if  JRC -> trackingMode  ==  known RF   */
-        // 1.  create  U, w, lamda, v, m for all featurs
-
-
+        bool JRCtrackingMode = jrc.trackingMode;
+        Eigen::MatrixXf Uinv_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*8);
+        Eigen::MatrixXf w_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*4);
+        Eigen::VectorXf v_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*1);
+        //Eigen::MatrixXf z_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*8);
+        Eigen::MatrixXf lamda_all = Eigen::MatrixXf::Zero(5,4);
+        Eigen::VectorXf m_all = Eigen::MatrixXf::Zero(5,1);
+        int numOfTrackFeature=0;
+        for (indx = 0 ; indx < nfeature ; indx++)  {
+            
+            /* Only track features that are not lost */
+            if (prevfl[indx].val >= 0)  {
+                if (prevfl[indx].used == false){
+                        //initialization
+                    jrc.initialization(prevfl[indx]);
+                    prevfl[indx].used = true;
+                }
+                // 1.  create  U, w, lamda, v, m for all features
+                jrc.constructMatrix(prevfl[indx],0, ksize, prevfl[indx].pt.x, prevfl[indx].pt.y, pyramid2[0], pyramid1[0] ,pyramid2_gradx[0], pyramid1_gradx[0],pyramid2_grady[0], pyramid1_grady[0],JRCtrackingMode);
+                //for constructing all Matrix
+                jrc.constructAllMatrix(prevfl[indx], numOfTrackFeature,Uinv_all,w_all,v_all,lamda_all,m_all);
+                numOfTrackFeature++;
+            }
+    
+        }
         // 2. calculate K by all featurs
-
-
-        // 3.  calculate each dx, dy with respect to each feature 
-
-        /* if  JRC -> trackingMode  ==  un known RF   */
-
-        // 1.  create  U, w, lamda, v, m for all featurs
-
-
-        // 2. calculate K by all featurs
-
-
-        // 3.  calculate each dx, dy with respect to each feature 
-
-
+        float K=0; //K is exposure time difference between two images.
+        jrc.blockAllMatrix(numOfTrackFeature,Uinv_all,w_all,v_all,lamda_all,m_all,JRCtrackingMode);
+        K= jrc.get_K(prevfl[indx],Uinv_all,w_all,v_all,lamda_all,m_all,JRCtrackingMode);
+        
+        // 3.  calculate each dx, dy with respect to each feature     
         /* For each feature, do ... */
-        for (indx = 0 ; indx < this->nfeatures ; indx++)  {
+        for (indx = 0 ; indx < nfeature ; indx++)  {
 
             /* Only track features that are not lost */
             if (prevfl[indx].val >= 0)  {
@@ -865,5 +877,102 @@ namespace klt{
         pyramid1.clear();
         pyramid1_gradx.clear();
         pyramid1_grady.clear();
+    }
+
+    int KLTtracker::_JRCtrackFeature(float x1, float y1, float *x2, float *y2,
+                      Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2){
+        int width = this->tracker.window_width;          /* size of window */
+        int height = this->tracker.window_height;
+        float step_factor= this->tracker.step_factor; /* 2.0 comes from equations, 1.0 seems to avoid overshooting */
+        int max_iterations= this->tracker.max_iterations;
+        float small= this->tracker.min_determinant;         /* determinant threshold for declaring KLT_SMALL_DET */
+        float th= this->tracker.min_displacement;            /* displacement threshold for stopping               */
+        float max_residue= this->tracker.max_residue;   /* residue threshold for declaring KLT_LARGE_RESIDUE */
+        int lighting_insensitive= this->tracker.lighting_insensitive;  /* whether to normalize for gain and bias */
+        
+        Mat imgdiff, gradx, grady;
+        float gxx, gxy, gyy, ex, ey, dx, dy;
+        int iteration = 0;
+        int status;
+        int hw = width/2;
+        int hh = height/2;
+        int nc = img1.cols;
+        int nr = img1.rows;
+        float one_plus_eps = 1.001f;   /* To prevent rounding errors */
+        /* Allocate memory for windows */
+        imgdiff = Mat::zeros(height,width,CV_32FC1);
+        gradx   = Mat::zeros(height,width,CV_32FC1);
+        grady   = Mat::zeros(height,width,CV_32FC1);
+
+        /* Iteratively update the window position */
+        do  {
+
+            /* If out of bounds, exit loop */
+            if (  x1-hw < 0.0f || nc-( x1+hw) < one_plus_eps ||
+                *x2-hw < 0.0f || nc-(*x2+hw) < one_plus_eps ||
+                y1-hh < 0.0f || nr-( y1+hh) < one_plus_eps ||
+                *y2-hh < 0.0f || nr-(*y2+hh) < one_plus_eps) {
+            status = KLT_OOB;
+            break;
+            }
+            
+            /* Compute gradient and difference windows */
+            if (lighting_insensitive) {
+                
+            _computeIntensityDifferenceLightingInsensitive(img1, img2, x1, y1, *x2, *y2, 
+                                        width, height, imgdiff);
+            _computeGradientSumLightingInsensitive(gradx1, grady1, gradx2, grady2, 
+                    img1, img2, x1, y1, *x2, *y2, width, height, gradx, grady);
+            } else {
+            _computeIntensityDifference(img1, img2, x1, y1, *x2, *y2, 
+                                        width, height, imgdiff);
+            _computeGradientSum(gradx1, grady1, gradx2, grady2, 
+                    x1, y1, *x2, *y2, width, height, gradx, grady);
+            }
+                
+
+            /* Use these windows to construct matrices */
+            _compute2by2GradientMatrix(gradx, grady, width, height, 
+                                    &gxx, &gxy, &gyy);
+            _compute2by1ErrorVector(imgdiff, gradx, grady, width, height, step_factor,
+                                    &ex, &ey);
+                        
+            /* Using matrices, solve equation for new displacement */
+            status = _solveEquation(gxx, gxy, gyy, ex, ey, small, &dx, &dy);
+            if (status == KLT_SMALL_DET)  break;
+
+            *x2 += dx;
+            *y2 += dy;
+            iteration++;
+
+        }  while ((fabs(dx)>=th || fabs(dy)>=th) && iteration < max_iterations);
+
+        /* Check whether window is out of bounds */
+        if (*x2-hw < 0.0f || nc-(*x2+hw) < one_plus_eps || 
+            *y2-hh < 0.0f || nr-(*y2+hh) < one_plus_eps)
+            status = KLT_OOB;
+
+        /* Check whether residue is too large */
+        if (status == KLT_TRACKED)  {
+            if (lighting_insensitive)
+            _computeIntensityDifferenceLightingInsensitive(img1, img2, x1, y1, *x2, *y2, 
+                                        width, height, imgdiff);
+            else
+            _computeIntensityDifference(img1, img2, x1, y1, *x2, *y2, 
+                                        width, height, imgdiff);
+            if (_sumAbsFloatWindow(imgdiff, width, height)/(width*height) > max_residue) 
+            status = KLT_LARGE_RESIDUE;
+        }
+
+        /* Free memory */
+        //free(imgdiff);  free(gradx);  free(grady);
+
+        /* Return appropriate value */
+        if (status == KLT_SMALL_DET)  return KLT_SMALL_DET;
+        else if (status == KLT_OOB)  return KLT_OOB;
+        else if (status == KLT_LARGE_RESIDUE)  return KLT_LARGE_RESIDUE;
+        else if (iteration >= max_iterations)  return KLT_MAX_ITERATIONS;
+        else  return KLT_TRACKED;
+
     }
 }

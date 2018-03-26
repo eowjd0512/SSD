@@ -130,7 +130,7 @@ void DrawTrackingPoints(vector<Point2f> &points, Mat &image){
 }
 int main (int argc, char *argv[])
 {
-  VideoCapture cap(0);
+  VideoCapture cap(1);
   if(!cap.isOpened()){
     cout<<"Cannot open cap"<<endl;
     return 0;

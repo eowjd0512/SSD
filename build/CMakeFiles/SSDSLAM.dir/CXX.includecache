@@ -11,10 +11,14 @@ cv.hpp
 /home/jun/SSD_SLAM/src/JointRadiometicCalib/cv.hpp
 iostream
 -
+eigen3/Eigen/Dense
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/eigen3/Eigen/Dense
 iostream
 -
 string
 -
+../klt/kltFeature.h
+/home/jun/SSD_SLAM/src/klt/kltFeature.h
 
 /home/jun/SSD_SLAM/src/klt/convolve.hpp
 iostream
@@ -45,6 +49,10 @@ cv.hpp
 /home/jun/SSD_SLAM/src/klt/cv.hpp
 convolve.hpp
 /home/jun/SSD_SLAM/src/klt/convolve.hpp
+eigen3/Eigen/Dense
+/home/jun/SSD_SLAM/src/klt/eigen3/Eigen/Dense
+vector
+-
 
 /home/jun/SSD_SLAM/src/klt/kltTrackingContext.h
 iostream

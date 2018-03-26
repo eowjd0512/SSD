@@ -21,15 +21,33 @@ fstream
 -
 math.h
 -
+eigen3/Eigen/Dense
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/eigen3/Eigen/Dense
 
 /home/jun/SSD_SLAM/src/JointRadiometicCalib/JRC.hpp
 cv.hpp
 /home/jun/SSD_SLAM/src/JointRadiometicCalib/cv.hpp
 iostream
 -
+eigen3/Eigen/Dense
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/eigen3/Eigen/Dense
 iostream
 -
 string
+-
+../klt/kltFeature.h
+/home/jun/SSD_SLAM/src/klt/kltFeature.h
+
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/MatrixOperation.cpp
+cv.hpp
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/cv.hpp
+iostream
+-
+JRC.hpp
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/JRC.hpp
+iostream
+-
+math.h
 -
 
 /home/jun/SSD_SLAM/src/klt/convolve.cpp
@@ -83,6 +101,10 @@ cv.hpp
 /home/jun/SSD_SLAM/src/klt/cv.hpp
 convolve.hpp
 /home/jun/SSD_SLAM/src/klt/convolve.hpp
+eigen3/Eigen/Dense
+/home/jun/SSD_SLAM/src/klt/eigen3/Eigen/Dense
+vector
+-
 
 /home/jun/SSD_SLAM/src/klt/kltTracking.cpp
 iostream
@@ -97,6 +119,8 @@ vector
 -
 string
 -
+eigen3/Eigen/Dense
+/home/jun/SSD_SLAM/src/klt/eigen3/Eigen/Dense
 
 /home/jun/SSD_SLAM/src/klt/kltTrackingContext.cpp
 iostream

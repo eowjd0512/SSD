@@ -6,24 +6,25 @@
 #include <string>
 #include <fstream>
 #include <math.h>
+#include "eigen3/Eigen/Dense"
 using namespace cv;
 using namespace std;
 namespace JRC{
-float get_numerical_derivative(float RF[], int x){
-    float dx = (RF[x+1]-RF[x]);
+float get_numerical_derivative(float RF[], float B[], int x){
+    float dx = (RF[x+1]-RF[x])/(B[x+1]-B[x]);
 }
 void JointRadiometicCalib::setRFderivatives(){
     for(int i=0;i<1023;i++)
-        this->g0_[i]=get_numerical_derivative(this->g0,i);
+        this->g0_[i]=get_numerical_derivative(this->g0, this->B, i);
     this->g0_[1023] = this->g0_[1022];
     for(int i=0;i<1023;i++)
-        this->h_[0][i]=get_numerical_derivative(this->h[0],i);
+        this->h_[0][i]=get_numerical_derivative(this->h[0],this->B,i);
     this->h_[0][1023] = this->h_[0][1022];
     for(int i=0;i<1023;i++)
-        this->h_[1][i]=get_numerical_derivative(this->h[1],i);
+        this->h_[1][i]=get_numerical_derivative(this->h[1],this->B,i);
     this->h_[1][1023] = this->h_[1][1022];
     for(int i=0;i<1023;i++)
-        this->h_[2][i]=get_numerical_derivative(this->h[2],i);
+        this->h_[2][i]=get_numerical_derivative(this->h[2],this->B,i);
     this->h_[2][1023] = this->h_[2][1022];
     
 }
@@ -165,12 +166,4 @@ float JointRadiometicCalib::get_d(int x, int y, float g0[],Mat J_origin, Mat I_o
     float d = g0[J_idx]-g0[I_idx];
     return d;
 }
-int JointRadiometicCalib::trackingKnownRF(float x1, float y1, float *x2, float *y2,
-                      Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2){
-                        
-                      }
-int JointRadiometicCalib::trackingUnknownRF(float x1, float y1, float *x2, float *y2,
-                      Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2){
-                          
-                      }
 }

@@ -4,6 +4,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/klt.dir/src/klt/kltTracking.cpp.o"
   "CMakeFiles/klt.dir/src/klt/convolve.cpp.o"
   "CMakeFiles/klt.dir/src/JointRadiometicCalib/JRC.cpp.o"
+  "CMakeFiles/klt.dir/src/JointRadiometicCalib/MatrixOperation.cpp.o"
   "libklt.pdb"
   "libklt.a"
 )
