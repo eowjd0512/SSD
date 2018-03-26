@@ -152,8 +152,8 @@ Eigen::VectorXf JointRadiometicCalib::get_v(int window_size, int x, int y, Mat J
         for (int j = -hh ; j <= hh ; j++)
             for (int i = -hw ; i <= hw ; i++)  {
                 beta = get_beta(x+i, y+j, J_origin, I_origin);
-                a = get_a(x+i, y+j, this->g0_, J_origin, I_origin, J_gradx, I_gradx);
-                b = get_b(x+i, y+j, this->g0_, J_origin, I_origin, J_grady, I_grady);
+                a = get_a(x+i, y+j, this->g0_, J_origin, I_origin, J_gradx, I_gradx,JRCtrackingMode);
+                b = get_b(x+i, y+j, this->g0_, J_origin, I_origin, J_grady, I_grady,JRCtrackingMode);
                 beta_a+=beta*a;
                 beta_b+=beta*b;
             }
@@ -273,7 +273,9 @@ float JointRadiometicCalib::get_K(kltFeature f,Eigen::MatrixXf Uinv_all,Eigen::M
     if (JRCtrackingMode ==0 ){ // known RF
         Eigen::MatrixXf A = -w_all.transpose()*Uinv_all*w_all+lamda_all;
         Eigen::MatrixXf b = -w_all.transpose()*Uinv_all*w_all+m_all;
-        float K = A[0]/b[0];
+        float A_ = A(0);
+        float b_ = b(0);
+        float K = b_/A_;
         return K;
     }else if(JRCtrackingMode ==1){// unknown RF
         int w=1;
