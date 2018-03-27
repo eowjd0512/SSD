@@ -753,6 +753,11 @@ namespace klt{
         Eigen::MatrixXf lamda_all = Eigen::MatrixXf::Zero(4,4);
         Eigen::VectorXf m_all = Eigen::MatrixXf::Zero(4,1);
         int numOfTrackFeature=0;
+        static int knownRFfirst=0;
+        if (JRCtrackingMode == 1){
+            knownRFfirst++;
+        }
+        if (knownRFfirst ==1) jrc.cal_g_and_g_();
         for (indx = 0 ; indx < nfeature ; indx++)  {
             
             /* Only track features that are not lost */
@@ -797,13 +802,19 @@ namespace klt{
                     /* Track feature at current resolution */
                     xloc *= subsampling;  yloc *= subsampling;
                     xlocout *= subsampling;  ylocout *= subsampling;
-
-                    val = _trackFeature(xloc, yloc, 
+                    
+                    val = _JRCtrackFeature(xloc, yloc, 
                         &xlocout, &ylocout,
                         pyramid1[r], 
                         pyramid1_gradx[r], pyramid1_grady[r], 
                         pyramid2[r], 
                         pyramid2_gradx[r], pyramid2_grady[r]);
+                    /*val = _trackFeature(xloc, yloc, 
+                        &xlocout, &ylocout,
+                        pyramid1[r], 
+                        pyramid1_gradx[r], pyramid1_grady[r], 
+                        pyramid2[r], 
+                        pyramid2_gradx[r], pyramid2_grady[r]);*/
 
                     if (val==KLT_SMALL_DET || val==KLT_OOB)
                         break;
@@ -916,7 +927,7 @@ namespace klt{
             break;
             }
             
-            /* Compute gradient and difference windows */
+            /* Compute gradient and difference windows 
             if (lighting_insensitive) {
                 
             _computeIntensityDifferenceLightingInsensitive(img1, img2, x1, y1, *x2, *y2, 
@@ -928,7 +939,7 @@ namespace klt{
                                         width, height, imgdiff);
             _computeGradientSum(gradx1, grady1, gradx2, grady2, 
                     x1, y1, *x2, *y2, width, height, gradx, grady);
-            }
+            }*/
                 
 
             /* Use these windows to construct matrices */

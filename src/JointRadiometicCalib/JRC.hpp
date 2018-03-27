@@ -18,6 +18,8 @@ int M; //order
 float c[3];
 float K;
 float B[1024];
+float g[1024];
+float g_[1024];
 float g0[1024]; //log-inverse of f
 float h[3][1024];
 float g0_[1024]; //derivative for g0
@@ -28,7 +30,7 @@ float h_[3][1024]; //derivative for h
 bool trackingMode; //0 : knownRF, 1: unknownRF
 JointRadiometicCalib(){setRFs(); trackingMode = 1; M=3;}
 ~JointRadiometicCalib(){}
-
+void cal_g_and_g_();
 int getIdxForRF(float x);
 void setRFs();
 void setRFderivatives();
@@ -42,12 +44,17 @@ float get_p_k(int x, int y, float h_[], Mat J_origin, Mat I_origin,Mat J_gradx, 
 float get_q_k(int x, int y, float h_[], Mat J_origin, Mat I_origin,Mat J_grady, Mat I_grady);
 float get_d(int x, int y, float g0[],Mat J_origin, Mat I_origin);
 
-Eigen::MatrixXf get_U(int window_size, int x, int y, Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx, Mat J_grady, Mat I_grady,bool JRCtrackingMode);
-Eigen::MatrixXf get_w(int window_size, int x, int y, Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx, Mat J_grady, Mat I_grady,bool JRCtrackingMode);
-Eigen::VectorXf get_v(int window_size, int x, int y, Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx, Mat J_grady, Mat I_grady,bool JRCtrackingMode);
+Eigen::MatrixXf get_U(int window_size, int x, int y, Mat a,Mat b);
+Eigen::MatrixXf get_U(int window_size, int x, int y, Mat aM,Mat bM,Mat pM[],Mat qM[]);
+Eigen::MatrixXf get_w(int window_size, int x, int y, Mat aM, Mat bM);
+Eigen::MatrixXf get_w(int window_size, int x, int y, Mat aM, Mat bM,Mat rM[],Mat pM[],Mat qM[]);
+Eigen::VectorXf get_v(int window_size, int x, int y, Mat aM, Mat bM, Mat betaM);
+Eigen::VectorXf get_v(int window_size, int x, int y, Mat aM, Mat bM, Mat dM, Mat pM[], Mat qM[]);
 Eigen::VectorXf get_z(bool JRCtrackingMode);
-Eigen::MatrixXf get_lamda(int window_size,int x, int y, Mat J_origin, Mat I_origin,bool JRCtrackingMode);
-Eigen::VectorXf get_m(int window_size, int x, int y, Mat J_origin, Mat I_origin,bool JRCtrackingMode);
+Eigen::MatrixXf get_lamda(int window_size,int x, int y);
+Eigen::MatrixXf get_lamda(int window_size,int x, int y, Mat rM[]);
+Eigen::VectorXf get_m(int window_size, int x, int y, Mat betaM);
+Eigen::VectorXf get_m(int window_size, int x, int y, Mat dM, Mat rM[]);
 
 void blockAllMatrix(int numOfTrackFeature,Eigen::MatrixXf &Uinv_all,Eigen::MatrixXf &w_all,Eigen::VectorXf &v_all,Eigen::MatrixXf &lamda_all,Eigen::VectorXf &m_all, bool JRCtrackingMode);
 float get_K(kltFeature f,Eigen::MatrixXf Uinv_all,Eigen::MatrixXf w_all,Eigen::VectorXf v_all,Eigen::MatrixXf lamda_all,Eigen::VectorXf m_all,bool JRCtrackingMode);
