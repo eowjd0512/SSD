@@ -12,6 +12,7 @@ using namespace std;
 namespace JRC{
 float get_numerical_derivative(float RF[], float B[], int x){
     float dx = (RF[x+1]-RF[x])/(B[x+1]-B[x]);
+    return dx;
 }
 void JointRadiometicCalib::setRFderivatives(){
     for(int i=0;i<1023;i++)
@@ -26,7 +27,7 @@ void JointRadiometicCalib::setRFderivatives(){
     for(int i=0;i<1023;i++)
         this->h_[2][i]=get_numerical_derivative(this->h[2],this->B,i);
     this->h_[2][1023] = this->h_[2][1022];
-    
+    for(int i=0;i<1024;i++) cout<<this->g0_[i]<<" ";
 }
 void JointRadiometicCalib::setRFs(){
 fstream infile;
@@ -53,9 +54,14 @@ while(k<5){
     if(k==0){
         this->B[i] = stof(number)*255.0;
     }
+    
     if(k==1){
-        this->g0[i] = log(stof(number)*255.0);
+        float val = log(stof(number)*255.0);
+        if(stof(number) ==0.0){val=log(1e-10*255.0);}
+        this->g0[i] = val;
     }else if(k>1){
+        float val = log(stof(number)*255.0);
+        if(stof(number) ==0.0){val=log(1e-10*255.0);}
         this->h[k-2][i]=log(stof(number)*255.0);
     }
     i++;
@@ -64,7 +70,8 @@ while(k<5){
 //for(int i=0;i<1024;i++) if(i==514)cout<<this->g0[i]<<" ";
 }
 int JointRadiometicCalib::getIdxForRF(float x){
-    int idx= int(x/255.0*1024);
+    int idx= int(x/255.0*1023.0);
+    if (idx ==0){cout<<"idx: 0 , it's possible to be error"<<endl;}
     return idx;
 }
 float JointRadiometicCalib::getRF_Value(int idx){
@@ -166,4 +173,29 @@ float JointRadiometicCalib::get_d(int x, int y, float g0[],Mat J_origin, Mat I_o
     float d = g0[J_idx]-g0[I_idx];
     return d;
 }
+
+void JointRadiometicCalib::updateByKalmanFilter(){
+    Eigen::MatrixXf c_prior = this->c_new;
+    Eigen::MatrixXf P_prior = this->P_new;
+    Eigen::MatrixXf identity = Eigen::MatrixXf::Identity(4,4);
+    Eigen::MatrixXf temp = (this->D.transpose()*this->D).inverse();
+    Eigen::MatrixXf temp2 = this->D*this->u_-this->b;
+    Eigen::MatrixXf temp3 = temp2*temp2.transpose();
+    Eigen::MatrixXf R = temp*temp3;
+
+    Eigen::MatrixXf k = P_prior*(P_prior+R).inverse();
+    this->c_new = c_prior+k*(this->u_-c_prior);
+    this->P_new = (identity-k)*P_prior;
+
+    static int stableCount=0;
+    if(abs(c_new(0)-c_prev(0))<1 &&abs(c_new(1)-c_prev(1))<1&& abs(c_new(2)-c_prev(2))<1 )
+        stableCount++;
+        if(stableCount >3){
+            this->trackingMode =0;
+            this->c[0] = this->c_new(0);
+            this->c[1] = this->c_new(1);
+            this->c[2] = this->c_new(2);
+        }
+}
+
 }

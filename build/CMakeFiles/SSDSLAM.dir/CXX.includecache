@@ -17,8 +17,8 @@ iostream
 -
 string
 -
-../klt/kltFeature.h
-/home/jun/SSD_SLAM/src/klt/kltFeature.h
+../klt/klt.h
+/home/jun/SSD_SLAM/src/klt/klt.h
 
 /home/jun/SSD_SLAM/src/klt/convolve.hpp
 iostream
@@ -39,8 +39,6 @@ convolve.hpp
 /home/jun/SSD_SLAM/src/klt/convolve.hpp
 vector
 -
-../JointRadiometicCalib/JRC.hpp
-/home/jun/SSD_SLAM/src/JointRadiometicCalib/JRC.hpp
 
 /home/jun/SSD_SLAM/src/klt/kltFeature.h
 iostream
@@ -75,6 +73,8 @@ cv.hpp
 /home/jun/SSD_SLAM/src/cv.hpp
 klt/klt.h
 /home/jun/SSD_SLAM/src/klt/klt.h
+JointRadiometicCalib/JRC.hpp
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/JRC.hpp
 vector
 -
 

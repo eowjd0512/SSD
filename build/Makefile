@@ -560,6 +560,33 @@ src/JointRadiometicCalib/JRC.cpp.s:
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/JRC.cpp.s
 .PHONY : src/JointRadiometicCalib/JRC.cpp.s
 
+src/JointRadiometicCalib/JRCtracking.o: src/JointRadiometicCalib/JRCtracking.cpp.o
+
+.PHONY : src/JointRadiometicCalib/JRCtracking.o
+
+# target to build an object file
+src/JointRadiometicCalib/JRCtracking.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/JRCtracking.cpp.o
+.PHONY : src/JointRadiometicCalib/JRCtracking.cpp.o
+
+src/JointRadiometicCalib/JRCtracking.i: src/JointRadiometicCalib/JRCtracking.cpp.i
+
+.PHONY : src/JointRadiometicCalib/JRCtracking.i
+
+# target to preprocess a source file
+src/JointRadiometicCalib/JRCtracking.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/JRCtracking.cpp.i
+.PHONY : src/JointRadiometicCalib/JRCtracking.cpp.i
+
+src/JointRadiometicCalib/JRCtracking.s: src/JointRadiometicCalib/JRCtracking.cpp.s
+
+.PHONY : src/JointRadiometicCalib/JRCtracking.s
+
+# target to generate assembly for a file
+src/JointRadiometicCalib/JRCtracking.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/JRCtracking.cpp.s
+.PHONY : src/JointRadiometicCalib/JRCtracking.cpp.s
+
 src/JointRadiometicCalib/MatrixOperation.o: src/JointRadiometicCalib/MatrixOperation.cpp.o
 
 .PHONY : src/JointRadiometicCalib/MatrixOperation.o
@@ -766,6 +793,9 @@ help:
 	@echo "... src/JointRadiometicCalib/JRC.o"
 	@echo "... src/JointRadiometicCalib/JRC.i"
 	@echo "... src/JointRadiometicCalib/JRC.s"
+	@echo "... src/JointRadiometicCalib/JRCtracking.o"
+	@echo "... src/JointRadiometicCalib/JRCtracking.i"
+	@echo "... src/JointRadiometicCalib/JRCtracking.s"
 	@echo "... src/JointRadiometicCalib/MatrixOperation.o"
 	@echo "... src/JointRadiometicCalib/MatrixOperation.i"
 	@echo "... src/JointRadiometicCalib/MatrixOperation.s"

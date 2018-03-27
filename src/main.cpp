@@ -6,6 +6,7 @@
 #include "SSDConfig.h"
 #include "cv.hpp"
 #include "klt/klt.h"
+#include "JointRadiometicCalib/JRC.hpp"
 //#include "klt/kltFeature.h"
 //#include "pnmio.hpp"
 //#include "klt.h" //here, all of implementation are included
@@ -15,6 +16,7 @@
 using namespace cv;
 using namespace std;
 using namespace klt;
+using namespace JRC;
 /// Function header
 #define KLT
 
@@ -54,7 +56,7 @@ int main (int argc, char *argv[])
   double k = 0.04;
   int maxCorners = 500;
 
-  KLTtracker kltTracker(maxCorners);
+  JointRadiometicCalib kltTracker(maxCorners);
   kltTracker.tracker.sequentialMode = true;
  
   //TermCriteria criteria=TermCriteria(TermCriteria::COUNT+TermCriteria::EPS,10,0.01);
@@ -91,7 +93,7 @@ int main (int argc, char *argv[])
     }
 
     if(!initialization &&prevFeaturelist.size()>0){
-      kltTracker.trackFeatures(prevImg,currImg,prevFeaturelist,currFeaturelist);
+      kltTracker.JRCtrackFeatures(prevImg,currImg,prevFeaturelist,currFeaturelist);
       //kltTracker.replaceLostFeatures(currImg, currFeaturelist);
       //cout<<currFeaturelist[0].val<<endl;
       DrawTrackingPoints(currFeaturelist,dstImg);
