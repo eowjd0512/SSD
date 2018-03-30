@@ -9,12 +9,12 @@ using namespace cv;
 using namespace std;
 namespace JRC{
 
-Eigen::MatrixXf JointRadiometicCalib::get_U(int window_size, int x, int y, Mat a,Mat b){
+Eigen::MatrixXd JointRadiometicCalib::get_U(int window_size, int x, int y, Mat a,Mat b){
     int hh = window_size/2;
     int hw = window_size/2;
     float a_=0;
     float b_=0;
-    Eigen::Matrix2f U = Eigen::Matrix2f::Zero();
+    Eigen::Matrix2d U = Eigen::Matrix2d::Zero();
     try{
 
     for (int j = -hh ; j <= hh ; j++)
@@ -35,23 +35,28 @@ Eigen::MatrixXf JointRadiometicCalib::get_U(int window_size, int x, int y, Mat a
     return U;
     
 }
-Eigen::MatrixXf JointRadiometicCalib::get_U(int window_size, int x, int y, Mat aM,Mat bM,Mat pM[],Mat qM[]){
+Eigen::MatrixXd JointRadiometicCalib::get_U(int window_size, int x, int y, Mat aM,Mat bM,Mat pM[],Mat qM[]){
     int hh = window_size/2;
     int hw = window_size/2;
     float a=0;
     float b=0;
     float p[3]={0};
     float q[3]={0};
-    Eigen::MatrixXf U = Eigen::MatrixXf::Zero(8,8);
+    Eigen::MatrixXd U = Eigen::MatrixXd::Zero(8,8);
     try{
-
-    for (int j = -hh ; j <= hh ; j++)
+    int cnt =0;
+    for (int j = -hh ; j <= hh ; j++){
+    cnt ++;
         for (int i = -hw ; i <= hw ; i++)  {
             a= aM.at<float>(y+j,x+i);
             b= bM.at<float>(y+j,x+i);
             for(int k=0; k<3;k++){
                 p[k]=pM[k].at<float>(y+j,x+i);
                 q[k]=qM[k].at<float>(y+j,x+i);
+            }
+            if (cnt == 2){
+                cout<< "a : "<<a<<endl;
+                cout<< "p[0] : "<<p[0]<<endl;
             }
             //first row and first cloumn
             U(0,0)+= a*a; U(0,1) = U(1,0) += a*p[0]; U(0,2) = U(2,0) += a*p[1]; U(0,3) = U(3,0) += a*p[2];
@@ -72,6 +77,7 @@ Eigen::MatrixXf JointRadiometicCalib::get_U(int window_size, int x, int y, Mat a
             //seventh row and column,  eight
             U(6,6)+= q[1]*q[1]; U(6,7) = U(7,6) += q[1]*q[2]; U(7,7) += q[2]*q[2];
         }
+    }
             
     }catch(int exception){
         cerr<< "U border error"<<endl;
@@ -79,12 +85,12 @@ Eigen::MatrixXf JointRadiometicCalib::get_U(int window_size, int x, int y, Mat a
     return U;
     
 }
-Eigen::MatrixXf JointRadiometicCalib::get_w(int window_size, int x, int y, Mat aM, Mat bM){
+Eigen::MatrixXd JointRadiometicCalib::get_w(int window_size, int x, int y, Mat aM, Mat bM){
     int hh = window_size/2;
     int hw = window_size/2;
     float a=0;
     float b=0;
-    Eigen::VectorXf w= Eigen::MatrixXf::Zero(2,1);
+    Eigen::VectorXd w= Eigen::MatrixXd::Zero(2,1);
     try{
         
     for (int j = -hh ; j <= hh ; j++)
@@ -99,7 +105,7 @@ Eigen::MatrixXf JointRadiometicCalib::get_w(int window_size, int x, int y, Mat a
     }
     return w;
 }
-Eigen::MatrixXf JointRadiometicCalib::get_w(int window_size, int x, int y, Mat aM, Mat bM,Mat rM[],Mat pM[],Mat qM[]){
+Eigen::MatrixXd JointRadiometicCalib::get_w(int window_size, int x, int y, Mat aM, Mat bM,Mat rM[],Mat pM[],Mat qM[]){
     int hh = window_size/2;
     int hw = window_size/2;
     float a=0;
@@ -107,7 +113,7 @@ Eigen::MatrixXf JointRadiometicCalib::get_w(int window_size, int x, int y, Mat a
     float p[3]={0};
     float q[3]={0};
     float r[3]={0};
-    Eigen::MatrixXf W = Eigen::MatrixXf::Zero(8,4);
+    Eigen::MatrixXd W = Eigen::MatrixXd::Zero(8,4);
     try{
 
     for (int j = -hh ; j <= hh ; j++)
@@ -134,13 +140,13 @@ Eigen::MatrixXf JointRadiometicCalib::get_w(int window_size, int x, int y, Mat a
     }
     return W;
 }
-Eigen::VectorXf JointRadiometicCalib::get_v(int window_size, int x, int y, Mat aM, Mat bM, Mat betaM){
+Eigen::VectorXd JointRadiometicCalib::get_v(int window_size, int x, int y, Mat aM, Mat bM, Mat betaM){
     int hh = window_size/2;
     int hw = window_size/2;
     float a=0;
     float b=0;
     float beta=0;
-    Eigen::Vector2f v;
+    Eigen::Vector2d v;
     try{
         
     for (int j = -hh ; j <= hh ; j++)
@@ -157,7 +163,7 @@ Eigen::VectorXf JointRadiometicCalib::get_v(int window_size, int x, int y, Mat a
     }
     return v;
 }
-Eigen::VectorXf JointRadiometicCalib::get_v(int window_size, int x, int y, Mat aM, Mat bM, Mat dM, Mat pM[], Mat qM[]){
+Eigen::VectorXd JointRadiometicCalib::get_v(int window_size, int x, int y, Mat aM, Mat bM, Mat dM, Mat pM[], Mat qM[]){
     int hh = window_size/2;
     int hw = window_size/2;
     float a=0;
@@ -165,7 +171,7 @@ Eigen::VectorXf JointRadiometicCalib::get_v(int window_size, int x, int y, Mat a
     float d=0;
     float p[3]={0};
     float q[3]={0};
-    Eigen::VectorXf v = Eigen::VectorXf::Zero(8);
+    Eigen::VectorXd v = Eigen::VectorXd::Zero(8);
     try{
     for (int j = -hh ; j <= hh ; j++)
         for (int i = -hw ; i <= hw ; i++)  {
@@ -186,11 +192,11 @@ Eigen::VectorXf JointRadiometicCalib::get_v(int window_size, int x, int y, Mat a
     return v;
     
 }
-Eigen::VectorXf JointRadiometicCalib::get_z(bool JRCtrackingMode){}
-Eigen::MatrixXf JointRadiometicCalib::get_lamda(int window_size,int x, int y){
+Eigen::VectorXd JointRadiometicCalib::get_z(bool JRCtrackingMode){}
+Eigen::MatrixXd JointRadiometicCalib::get_lamda(int window_size,int x, int y){
     int hh = window_size/2;
     int hw = window_size/2;
-    Eigen::MatrixXf lamda(1,1);
+    Eigen::MatrixXd lamda(1,1);
     lamda(0,0)=0;
     for (int j = -hh ; j <= hh ; j++)
         for (int i = -hw ; i <= hw ; i++)  {
@@ -198,11 +204,11 @@ Eigen::MatrixXf JointRadiometicCalib::get_lamda(int window_size,int x, int y){
         }
     return lamda;
 }
-Eigen::MatrixXf JointRadiometicCalib::get_lamda(int window_size,int x, int y, Mat rM[]){
+Eigen::MatrixXd JointRadiometicCalib::get_lamda(int window_size,int x, int y, Mat rM[]){
     int hh = window_size/2;
     int hw = window_size/2;
     float r[3]={0};
-    Eigen::MatrixXf lamda = Eigen::MatrixXf::Zero(4,4);
+    Eigen::MatrixXd lamda = Eigen::MatrixXd::Zero(4,4);
     try{
     for (int j = -hh ; j <= hh ; j++)
         for (int i = -hw ; i <= hw ; i++)  {
@@ -220,10 +226,10 @@ Eigen::MatrixXf JointRadiometicCalib::get_lamda(int window_size,int x, int y, Ma
     }
     return lamda;
 }
-Eigen::VectorXf JointRadiometicCalib::get_m(int window_size, int x, int y, Mat betaM){
+Eigen::VectorXd JointRadiometicCalib::get_m(int window_size, int x, int y, Mat betaM){
     int hh = window_size/2;
     int hw = window_size/2;
-    Eigen::VectorXf beta(1);
+    Eigen::VectorXd beta(1);
     beta(0)=0;
     try{
         
@@ -237,12 +243,12 @@ Eigen::VectorXf JointRadiometicCalib::get_m(int window_size, int x, int y, Mat b
     beta *=2;
     return beta;
 }
-Eigen::VectorXf JointRadiometicCalib::get_m(int window_size, int x, int y, Mat dM, Mat rM[]){
+Eigen::VectorXd JointRadiometicCalib::get_m(int window_size, int x, int y, Mat dM, Mat rM[]){
     int hh = window_size/2;
     int hw = window_size/2;
     float d=0;
     float r[3]={0};
-    Eigen::VectorXf m = Eigen::VectorXf::Zero(4);
+    Eigen::VectorXd m = Eigen::VectorXd::Zero(4);
     try{
     for (int j = -hh ; j <= hh ; j++)
         for (int i = -hw ; i <= hw ; i++)  {
@@ -258,10 +264,10 @@ Eigen::VectorXf JointRadiometicCalib::get_m(int window_size, int x, int y, Mat d
     }
     return m;
 }
-float JointRadiometicCalib::get_K(kltFeature f,Eigen::MatrixXf Uinv_all,Eigen::MatrixXf w_all,Eigen::VectorXf v_all,Eigen::MatrixXf lamda_all,Eigen::VectorXf m_all,bool JRCtrackingMode){
+float JointRadiometicCalib::get_K(kltFeature f,Eigen::MatrixXd Uinv_all,Eigen::MatrixXd w_all,Eigen::VectorXd v_all,Eigen::MatrixXd lamda_all,Eigen::VectorXd m_all,bool JRCtrackingMode){
     if (JRCtrackingMode ==0 ){ // known RF
-        Eigen::MatrixXf A = -w_all.transpose()*Uinv_all*w_all+lamda_all;
-        Eigen::MatrixXf b = -w_all.transpose()*Uinv_all*w_all+m_all;
+        Eigen::MatrixXd A = -w_all.transpose()*Uinv_all*w_all+lamda_all;
+        Eigen::MatrixXd b = -w_all.transpose()*Uinv_all*w_all+m_all;
         float A_ = A(0);
         float b_ = b(0);
         float K = b_/A_;
@@ -269,15 +275,15 @@ float JointRadiometicCalib::get_K(kltFeature f,Eigen::MatrixXf Uinv_all,Eigen::M
     }else if(JRCtrackingMode ==1){// unknown RF
         int w=1;
         int tou= getIdxForRF(128);
-        Eigen::MatrixXf A = -w_all.transpose()*Uinv_all*w_all+lamda_all;
-        Eigen::MatrixXf b = -w_all.transpose()*Uinv_all*w_all+m_all;
-        Eigen::MatrixXf A_(5,4);
-        Eigen::MatrixXf b_(5,1);
+        Eigen::MatrixXd A = -w_all.transpose()*Uinv_all*w_all+lamda_all;
+        Eigen::MatrixXd b = -w_all.transpose()*Uinv_all*w_all+m_all;
+        Eigen::MatrixXd A_(5,4);
+        Eigen::MatrixXd b_(5,1);
         A_.block(0,0,4,4) = A;
         b_.block(0,0,4,1) = b;
         A_(4,0)=w*this->h[0][tou]; A_(4,1)=w*this->h[1][tou];A_(4,2)=w*this->h[2][tou];A_(4,3)=0;
         b_(4,0)=w*(log(128)-this->g0[tou]);
-        Eigen::Vector4f x;
+        Eigen::MatrixXd x;
         try{
         //x= A_.llt().solve(b_);
         x = A_.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_);
@@ -290,12 +296,12 @@ float JointRadiometicCalib::get_K(kltFeature f,Eigen::MatrixXf Uinv_all,Eigen::M
         //Eigen::Vector4f x = A_.ldlt().solve(b_);
         //Eigen::Vector4f x = A_.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b_);
         //float K = right[0]/left[0];
-        this->c[0] = x(0); this->c[1] = x(1); this->c[2] = x(2);
-        return x(3);
+        this->c[0] = x(0,0); this->c[1] = x(1,0); this->c[2] = x(2,0);
+        return x(3,0);
     }
 }
 
-void JointRadiometicCalib::blockAllMatrix(int numOfTrackFeature,Eigen::MatrixXf &Uinv_all,Eigen::MatrixXf &w_all,Eigen::VectorXf &v_all,Eigen::MatrixXf &lamda_all,Eigen::VectorXf &m_all, bool JRCtrackingMode){
+void JointRadiometicCalib::blockAllMatrix(int numOfTrackFeature,Eigen::MatrixXd &Uinv_all,Eigen::MatrixXd &w_all,Eigen::VectorXd &v_all,Eigen::MatrixXd &lamda_all,Eigen::VectorXd &m_all, bool JRCtrackingMode){
     if (JRCtrackingMode ==0 ){ // known RF
         Uinv_all = Uinv_all.block(0, 0, numOfTrackFeature*2, numOfTrackFeature*2);
         w_all = w_all.block(0, 0, numOfTrackFeature*2, 2);
@@ -310,7 +316,7 @@ void JointRadiometicCalib::blockAllMatrix(int numOfTrackFeature,Eigen::MatrixXf 
     }
 }
 
-void JointRadiometicCalib::constructAllMatrix(kltFeature f, int numOfTrackFeature, Eigen::MatrixXf &Uinv_all,Eigen::MatrixXf &w_all,Eigen::VectorXf &v_all,Eigen::MatrixXf &lamda_all,Eigen::VectorXf &m_all){
+void JointRadiometicCalib::constructAllMatrix(kltFeature f, int numOfTrackFeature, Eigen::MatrixXd &Uinv_all,Eigen::MatrixXd &w_all,Eigen::VectorXd &v_all,Eigen::MatrixXd &lamda_all,Eigen::VectorXd &m_all){
     Uinv_all.block(numOfTrackFeature*f.U[0].rows(), numOfTrackFeature*f.U[0].cols(), f.U[0].rows(), f.U[0].cols()) = f.U[0].inverse();
     w_all.block(numOfTrackFeature*f.w[0].rows(), 0, f.w[0].rows(), f.w[0].cols()) = f.w[0];
     v_all.block(numOfTrackFeature*f.v[0].rows(), 0, f.v[0].rows(), f.v[0].cols()) = f.v[0];
@@ -356,12 +362,12 @@ void JointRadiometicCalib::constructMatrix(kltFeature f, int pylevel, int window
     }
 
     //cout<<"1"<<endl;
-    Eigen::MatrixXf U = get_U(window_size,x,y,a,b);
-    Eigen::VectorXf w = get_w(window_size,x,y,a,b);
-    Eigen::VectorXf v = get_v(window_size,x,y,a,b,beta);
+    Eigen::MatrixXd U = get_U(window_size,x,y,a,b);
+    Eigen::VectorXd w = get_w(window_size,x,y,a,b);
+    Eigen::VectorXd v = get_v(window_size,x,y,a,b,beta);
     //Eigen::Vector3f z = get_z_knownRF(window_size,x,y,J_origin,I_origin,J_gradx,I_gradx,J_grady,I_grady);
-    Eigen::MatrixXf lamda = get_lamda(window_size,x,y);
-    Eigen::VectorXf m  = get_m(window_size,x,y,beta);
+    Eigen::MatrixXd lamda = get_lamda(window_size,x,y);
+    Eigen::VectorXd m  = get_m(window_size,x,y,beta);
     f.U[pylevel]=U;
     f.w[pylevel]=w;
     f.v[pylevel]=v;
@@ -407,16 +413,17 @@ void JointRadiometicCalib::constructMatrix(kltFeature f, int pylevel, int window
             data_q2[i]=(this->h_[2][J_index]*data_J_grady[i] + this->h_[2][I_index]*data_I_grady[i])/2.0;
             data_d[i] = this->g0[J_index] - this->g0[I_index];
         }
-        cout << a <<endl;
-
-        Eigen::MatrixXf U = get_U(window_size,x,y,a,b,p,q);
-        Eigen::VectorXf w = get_w(window_size,x,y,a,b,r,p,q);
-        Eigen::VectorXf v = get_v(window_size,x,y,a,b,d,p,q);
+        //cout << "a"<<endl;
+        //cout << a <<endl;
+        //imwrite("/home/jun/SSD_SLAM/debug/grad.jpg", grad_);
+        Eigen::MatrixXd U = get_U(window_size,x,y,a,b,p,q);
+        Eigen::VectorXd w = get_w(window_size,x,y,a,b,r,p,q);
+        Eigen::VectorXd v = get_v(window_size,x,y,a,b,d,p,q);
         //Eigen::Vector3f z = get_z_knownRF(window_size,x,y,J_origin,I_origin,J_gradx,I_gradx,J_grady,I_grady);
-        Eigen::MatrixXf lamda = get_lamda(window_size,x,y,r);
-        Eigen::VectorXf m  = get_m(window_size,x,y,d,r);
+        Eigen::MatrixXd lamda = get_lamda(window_size,x,y,r);
+        Eigen::VectorXd m  = get_m(window_size,x,y,d,r);
         cout<<"3"<<endl;
-        cout<<U<<endl;
+        //cout<<U<<endl;
         f.U[pylevel]=U;
         cout<<"4"<<endl;
         f.w[pylevel]=w;
@@ -433,11 +440,11 @@ void JointRadiometicCalib::constructMatrix(kltFeature f, int pylevel, int window
 }
 void JointRadiometicCalib::initialization(kltFeature f){
     //if (JRCtrakingMode == 0){
-        Eigen::MatrixXf U = Eigen::MatrixXf::Zero(8,8);
-        Eigen::VectorXf w,v;
-        Eigen::VectorXf z;
-        Eigen::MatrixXf lamda;
-        Eigen::VectorXf m;
+        Eigen::MatrixXd U = Eigen::MatrixXd::Zero(8,8);
+        Eigen::VectorXd w,v;
+        Eigen::VectorXd z;
+        Eigen::MatrixXd lamda;
+        Eigen::VectorXd m;
         for (int i=0; i< this->M; i++){
             f.U.push_back(U);
             f.w.push_back(w);
@@ -450,9 +457,9 @@ void JointRadiometicCalib::initialization(kltFeature f){
 }
 int JointRadiometicCalib::solveEquation(kltFeature f, int r, float K, float *dx, float *dy, float small,bool trackingMode){
     if (trackingMode==0){
-        Eigen::MatrixXf A = f.U[r];
-        Eigen::MatrixXf b = f.v[r]-K*f.w[r];
-        Eigen::VectorXf x;
+        Eigen::MatrixXd A = f.U[r];
+        Eigen::MatrixXd b = f.v[r]-K*f.w[r];
+        Eigen::VectorXd x;
         try{
         x= A.llt().solve(b);
         }catch(int exception){
@@ -464,16 +471,16 @@ int JointRadiometicCalib::solveEquation(kltFeature f, int r, float K, float *dx,
         return KLT_TRACKED;
 
     }else if(trackingMode ==1){
-        Eigen::Vector4f c_;
+        Eigen::Vector4d c_;
         c_(0)=1;  c_(1)=this->c[0];  c_(2)=this->c[1];
         c_(3)=this->c[2];
 
-        Eigen::MatrixXf Y1 = f.U[r].block(0,0,8,4)*c_;
-        Eigen::MatrixXf Y2 = f.U[r].block(0,4,8,4)*c_;
-        Eigen::VectorXf Y(8,2);
+        Eigen::MatrixXd Y1 = f.U[r].block(0,0,8,4)*c_;
+        Eigen::MatrixXd Y2 = f.U[r].block(0,4,8,4)*c_;
+        Eigen::VectorXd Y(8,2);
         Y.block(0,0,8,1)=Y1; Y.block(0,1,8,1)=Y2; 
-        Eigen::VectorXf b = f.v[r]-f.w[r]*this->u_;
-        Eigen::VectorXf x;
+        Eigen::VectorXd b = f.v[r]-f.w[r]*this->u_;
+        Eigen::VectorXd x;
         try{
         //x= Y.llt().solve(b);
         x = Y.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(b);

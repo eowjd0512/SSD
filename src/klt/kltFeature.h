@@ -30,12 +30,12 @@ class kltFeature{
     //vector for multi pyramid
  
     //for unknown Response Function
-    vector<Eigen::MatrixXf> U;
-    vector<Eigen::MatrixXf> w;
-    vector<Eigen::VectorXf> v;
-    vector<Eigen::VectorXf> z;
-    vector<Eigen::MatrixXf> lamda;
-    vector<Eigen::VectorXf> m;
+    vector<Eigen::MatrixXd> U;
+    vector<Eigen::MatrixXd> w;
+    vector<Eigen::VectorXd> v;
+    vector<Eigen::VectorXd> z;
+    vector<Eigen::MatrixXd> lamda;
+    vector<Eigen::VectorXd> m;
     
     kltFeature(){ used = false;}
     ~kltFeature(){}

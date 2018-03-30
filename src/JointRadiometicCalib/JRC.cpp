@@ -7,6 +7,8 @@
 #include <fstream>
 #include <math.h>
 #include "eigen3/Eigen/Dense"
+#include <opencv2/highgui.hpp>
+#include <opencv2/plot.hpp>
 using namespace cv;
 using namespace std;
 namespace JRC{
@@ -27,10 +29,52 @@ void JointRadiometicCalib::setRFderivatives(){
     for(int i=0;i<1023;i++)
         this->h_[2][i]=get_numerical_derivative(this->h[2],this->B,i);
     this->h_[2][1023] = this->h_[2][1022];
-    for(int i=0;i<1024;i++) cout<<this->g0_[i]<<" ";
+    //for(int i=0;i<1024;i++) cout<<this->h[0][i]<<" ";
 }
 void JointRadiometicCalib::setRFs(){
 fstream infile;
+//infile.open(path);
+infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/dorfCurves.txt");
+string title;
+string temp;
+string number = "";
+bool flag = false;
+int cnt=0;
+int k=-1;
+Mat W_RF(201,1025,CV_64FC1);
+Eigen::VectorXf v = Eigen::VectorXf::Zero(1024);
+while(1){
+    if (flag == false){
+    infile >> title;
+        //cout<<title<<" ";
+        if (title.compare("B")==0){
+            //cout<<"B!!!"<<endl;
+            infile>>temp;
+            if(temp.compare("=")==0){
+                //cout<< "flag turn"<<endl;
+                flag = true;
+                k++;
+                //continue;
+            }
+        }
+    }else{
+        
+        infile >> number;
+        v(cnt)+=log(stof(number));
+        W_RF.at<double>(k,cnt) = log(stof(number));
+        //if(k==200)
+        //cout<<"cnt: "<<cnt<<", number: "<<number<< " | ";
+        cnt++;
+        if(stof(number)==1.0){//cout << "cnt: "<<cnt<<endl; 
+        //W_RF.at<double>(k,1024) = 1.0;
+        infile >> number;
+        flag = false; cnt =0; }
+        //cout<<number;
+        
+    }
+    if (k==201) {cout<< "done"<<endl;break;}
+/*
+    fstream infile;
 //infile.open(path);
 infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/invemor.txt");
 string title;
@@ -62,10 +106,50 @@ while(k<5){
     }else if(k>1){
         float val = log(stof(number)*255.0);
         if(stof(number) ==0.0){val=log(1e-10*255.0);}
-        this->h[k-2][i]=log(stof(number)*255.0);
+        cout<< "number: "<<number;
+        this->h[k-2][i]=val;
     }
-    i++;
+    i++;*/
 }
+    v = v/201;
+    for(int i=0;i<1024;i++){
+          cout<< W_RF.at<double>(200,i)<< " ";
+        //cout<< v(i)<< " ";
+          }
+
+    
+    Mat C(1024,1024,CV_64FC1);
+    for(int y=1;y<1024;y++){
+        for(int x=1;x<1024;x++){
+            for(int j=0;j<201;j++)
+            C.at<double>(y,x) += (W_RF.at<double>(j,x)-v(x))*(W_RF.at<double>(j,y)-v(y));
+        }
+    }
+    Mat eValsX;
+    Mat eVectsX;
+    eigen(C,eValsX,eVectsX);
+
+    //cout<<eVectsX<<endl;
+    //for(int i=0;i<1024;i++){cout<<eVectsX.at<double>(200,i)<<"endl";}
+
+    Mat A(1,1024,CV_64FC1);
+    //A.copyTo(C.row(0));
+     for(int i=0;i<1024;i++){
+         //A.at<double>(0,i) = C.at<double>(i,0);
+         A.at<double>(0,i) = eVectsX.at<double>(1,i) * 1000000;
+         //A.at<double>(0,i) = v(i) * 10000;
+          //cout<< A.at<double>(0,i)<< " ";
+          }
+    Mat plot_result;
+
+    Ptr<plot::Plot2d> plot = plot::Plot2d::create(A);
+    plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
+    plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
+    plot->render( plot_result );
+
+    imshow( "plot", plot_result );
+    
+    //cout<< W_RF<<endl;
 //cout<< "i: "<<i<<endl;
 //for(int i=0;i<1024;i++) if(i==514)cout<<this->g0[i]<<" ";
 }
@@ -175,15 +259,15 @@ float JointRadiometicCalib::get_d(int x, int y, float g0[],Mat J_origin, Mat I_o
 }
 
 void JointRadiometicCalib::updateByKalmanFilter(){
-    Eigen::MatrixXf c_prior = this->c_new;
-    Eigen::MatrixXf P_prior = this->P_new;
-    Eigen::MatrixXf identity = Eigen::MatrixXf::Identity(4,4);
-    Eigen::MatrixXf temp = (this->D.transpose()*this->D).inverse();
-    Eigen::MatrixXf temp2 = this->D*this->u_-this->b;
-    Eigen::MatrixXf temp3 = temp2*temp2.transpose();
-    Eigen::MatrixXf R = temp*temp3;
+    Eigen::MatrixXd c_prior = this->c_new;
+    Eigen::MatrixXd P_prior = this->P_new;
+    Eigen::MatrixXd identity = Eigen::MatrixXd::Identity(4,4);
+    Eigen::MatrixXd temp = (this->D.transpose()*this->D).inverse();
+    Eigen::MatrixXd temp2 = this->D*this->u_-this->b;
+    Eigen::MatrixXd temp3 = temp2*temp2.transpose();
+    Eigen::MatrixXd R = temp*temp3;
 
-    Eigen::MatrixXf k = P_prior*(P_prior+R).inverse();
+    Eigen::MatrixXd k = P_prior*(P_prior+R).inverse();
     this->c_new = c_prior+k*(this->u_-c_prior);
     this->P_new = (identity-k)*P_prior;
 

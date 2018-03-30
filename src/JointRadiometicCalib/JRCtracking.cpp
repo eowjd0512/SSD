@@ -144,12 +144,12 @@ void JointRadiometicCalib::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<klt
     }
     //JRC::JointRadiometicCalib jrc;
     bool JRCtrackingMode = this->trackingMode;
-    Eigen::MatrixXf Uinv_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*8);
-    Eigen::MatrixXf w_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*4);
-    Eigen::VectorXf v_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*1);
-    //Eigen::MatrixXf z_all = Eigen::MatrixXf::Zero(nfeature*8,nfeature*8);
-    Eigen::MatrixXf lamda_all = Eigen::MatrixXf::Zero(4,4);
-    Eigen::VectorXf m_all = Eigen::MatrixXf::Zero(4,1);
+    Eigen::MatrixXd Uinv_all = Eigen::MatrixXd::Zero(nfeature*8,nfeature*8);
+    Eigen::MatrixXd w_all = Eigen::MatrixXd::Zero(nfeature*8,nfeature*4);
+    Eigen::VectorXd v_all = Eigen::MatrixXd::Zero(nfeature*8,nfeature*1);
+    //Eigen::MatrixXd z_all = Eigen::MatrixXd::Zero(nfeature*8,nfeature*8);
+    Eigen::MatrixXd lamda_all = Eigen::MatrixXd::Zero(4,4);
+    Eigen::VectorXd m_all = Eigen::MatrixXd::Zero(4,1);
     int numOfTrackFeature=0;
     static unsigned int knownRFfirst=0;
     if (JRCtrackingMode == 1){

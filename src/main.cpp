@@ -18,7 +18,23 @@ using namespace std;
 using namespace klt;
 using namespace JRC;
 /// Function header
-#define KLT
+#define test
+
+#ifdef test
+
+int main (int argc, char *argv[])
+{
+ int maxCorners = 500;
+  JointRadiometicCalib kltTracker(maxCorners);
+  kltTracker.tracker.sequentialMode = true;
+
+    waitKey(0);
+
+  
+  return 0;
+}
+#endif
+
 
 #ifdef KLT
 bool initialization = false;
@@ -93,10 +109,10 @@ int main (int argc, char *argv[])
     }
 
     if(!initialization &&prevFeaturelist.size()>0){
-      kltTracker.JRCtrackFeatures(prevImg,currImg,prevFeaturelist,currFeaturelist);
+      //kltTracker.JRCtrackFeatures(prevImg,currImg,prevFeaturelist,currFeaturelist);
       //kltTracker.replaceLostFeatures(currImg, currFeaturelist);
       //cout<<currFeaturelist[0].val<<endl;
-      DrawTrackingPoints(currFeaturelist,dstImg);
+      //DrawTrackingPoints(currFeaturelist,dstImg);
     }
     /// Show what you got 
     //namedWindow( source_window, CV_WINDOW_AUTOSIZE );
