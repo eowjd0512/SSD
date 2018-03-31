@@ -55,11 +55,12 @@ while(k<1){
     infile >> number;
     
     if(k==0){
-        this->B[i] = stof(number)*255.0;
+        this->B[i] = stof(number);
     }
     i++;
 }
-
+cout<< "done"<<endl;
+infile.close();
 infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/dorfCurves.txt");
 //string title;
 //string temp;
@@ -67,7 +68,8 @@ infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/dorfCurves.txt");
 bool flag = false;
 int cnt=0;
 k=-1;
-Mat W_RF(201,1025,CV_64FC1);
+Mat W_RF(201,1024,CV_64FC1);
+Mat W_RF_inv(201,1024,CV_64FC1);
 Eigen::VectorXf v = Eigen::VectorXf::Zero(1024);
 while(1){
     if (flag == false){
@@ -86,7 +88,7 @@ while(1){
     }else{
         
         infile >> number;
-        v(cnt)+=(stof(number));
+        //v(cnt)+=log(stof(number));
         W_RF.at<double>(k,cnt) = (stof(number));
         //if(k==200)
         //cout<<"cnt: "<<cnt<<", number: "<<number<< " | ";
@@ -98,8 +100,30 @@ while(1){
         //cout<<number;
         
     }
-    //if (k==201) {cout<< "done"<<endl;break;}
-    if (k==1) {cout<< "done"<<endl;break;}
+    if (k==201) {cout<< "done"<<endl;break;}
+    //if (k==1) {cout<< "done"<<endl;break;}
+    
+}
+ //calculate inverse of F
+double min = 999.0;
+double var =0.;
+int minIdx=0;
+//Eigen::VectorXd f_inv =Eigen::VectorXd::Zero(1024);
+for(int k=0;k<201;k++)
+    for(int i=0;i<1024;i++){
+        for (int j=0; j<1024;j++){
+            if (abs(W_RF.at<double>(k,j)-B[i])<min){
+                min = abs(W_RF.at<double>(k,j)-B[i]);
+                minIdx = j;
+            }
+        }
+        min = 999.;
+        var = B[minIdx];
+        if(var ==0) var = 1e-20;
+        W_RF_inv.at<double>(k,i) = log(var);
+        v(i)+=log(var);
+    }
+
 /*
     fstream infile;
 //infile.open(path);
@@ -137,19 +161,23 @@ while(k<5){
         this->h[k-2][i]=val;
     }
     i++;*/
-}
+    
     v = v/201;
     for(int i=0;i<1024;i++){
-          cout<< W_RF.at<double>(200,i)<< " ";
-        //cout<< v(i)<< " ";
-          }
+          //cout<< W_RF_inv.at<double>(0,i)<< " ";
+        cout<< v(i)<< " ";
+         }
 
+    int offset = 0;   
+    Mat C(1024-offset,1024-offset,CV_64FC1);
     
-    Mat C(1024,1024,CV_64FC1);
-    for(int y=1;y<1024;y++){
-        for(int x=1;x<1024;x++){
+    for(int y=offset;y<1024;y++){
+        for(int x=offset;x<1024;x++){
             for(int j=0;j<201;j++)
-            C.at<double>(y,x) += (W_RF.at<double>(j,x)-v(x))*(W_RF.at<double>(j,y)-v(y));
+            C.at<double>(y-offset,x-offset) += (W_RF_inv.at<double>(j,x)-v(x))*(W_RF_inv.at<double>(j,y)-v(y));
+            if(y<256 || x<256){
+                C.at<double>(y-offset,x-offset) = 0.;
+            }
         }
     }
     Mat eValsX;
@@ -157,25 +185,53 @@ while(k<5){
     eigen(C,eValsX,eVectsX);
 
     //cout<<eVectsX<<endl;
-    //for(int i=0;i<1024;i++){cout<<eVectsX.at<double>(200,i)<<"endl";}
+    //for(int i=0;i<1024;i++){cout<<eVectsX.at<double>(0,i)<<" ";}
 
-    Mat A(1,1024,CV_64FC1);
+    Mat A(1,1024-offset,CV_64FC1);
     //A.copyTo(C.row(0));
-     for(int i=0;i<1024;i++){
-         //A.at<double>(0,i) = C.at<double>(i,0);
-         A.at<double>(0,i) = eVectsX.at<double>(1,i) * 1000000;
+     for(int i=0;i<1024-offset;i++){
+         A.at<double>(0,i) = eVectsX.at<double>(0,i)*10000;
+         //A.at<double>(0,i) = W_RF.at<double>(0,i);
+         //A.at<double>(0,i) = v(i);
+         //A.at<double>(0,i) = eVectsX.at<double>(1,i) * 1000000;
          //A.at<double>(0,i) = v(i) * 10000;
-          //cout<< A.at<double>(0,i)<< " ";
+          cout<< A.at<double>(0,i)<< " ";
           }
-    Mat plot_result;
+    Mat plot_result,plot_result2,plot_result3,plot_result4;
 
     Ptr<plot::Plot2d> plot = plot::Plot2d::create(A);
     plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
     plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
     plot->render( plot_result );
-
     imshow( "plot", plot_result );
-    
+//////////////////////////////////////////////////////////////////////
+    for(int i=0;i<1024-offset;i++){
+         A.at<double>(0,i) = eVectsX.at<double>(1,i)*10000;
+          }
+    plot = plot::Plot2d::create(A);
+    plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
+    plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
+    plot->render( plot_result2 );
+    imshow( "plot2", plot_result2 );
+    ////////////////////////////////////////////////////////////////////////
+    for(int i=0;i<1024-offset;i++){
+         A.at<double>(0,i) = eVectsX.at<double>(2,i)*10000;
+          }
+    plot = plot::Plot2d::create(A);
+    plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
+    plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
+    plot->render( plot_result3 );
+    imshow( "plot3", plot_result3 );
+    /////////////////////////////////////////////////////////////////////////
+    for(int i=0;i<1024-offset;i++){
+         A.at<double>(0,i) = eVectsX.at<double>(3,i)*10000;
+          }
+    plot = plot::Plot2d::create(A);
+    plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
+    plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
+    plot->render( plot_result4 );
+    imshow( "plot4", plot_result4 );
+
     //cout<< W_RF<<endl;
 //cout<< "i: "<<i<<endl;
 //for(int i=0;i<1024;i++) if(i==514)cout<<this->g0[i]<<" ";
