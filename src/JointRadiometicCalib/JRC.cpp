@@ -34,13 +34,39 @@ void JointRadiometicCalib::setRFderivatives(){
 void JointRadiometicCalib::setRFs(){
 fstream infile;
 //infile.open(path);
-infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/dorfCurves.txt");
+
+infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/invemor.txt");
 string title;
 string temp;
 string number = "";
+infile >> title>>temp;
+int i=0;
+//cout<< "title: "<<title<<", temp: "<< temp<< endl;
+int k=0;
+
+while(k<1){
+    if (i==1024){
+        infile >> title >> temp;
+        cout<< "title: "<<title<<", temp: "<< temp<< endl;
+        i=0;
+        k++;
+    }
+    
+    infile >> number;
+    
+    if(k==0){
+        this->B[i] = stof(number)*255.0;
+    }
+    i++;
+}
+
+infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/dorfCurves.txt");
+//string title;
+//string temp;
+//string number = "";
 bool flag = false;
 int cnt=0;
-int k=-1;
+k=-1;
 Mat W_RF(201,1025,CV_64FC1);
 Eigen::VectorXf v = Eigen::VectorXf::Zero(1024);
 while(1){
@@ -60,8 +86,8 @@ while(1){
     }else{
         
         infile >> number;
-        v(cnt)+=log(stof(number));
-        W_RF.at<double>(k,cnt) = log(stof(number));
+        v(cnt)+=(stof(number));
+        W_RF.at<double>(k,cnt) = (stof(number));
         //if(k==200)
         //cout<<"cnt: "<<cnt<<", number: "<<number<< " | ";
         cnt++;
@@ -72,7 +98,8 @@ while(1){
         //cout<<number;
         
     }
-    if (k==201) {cout<< "done"<<endl;break;}
+    //if (k==201) {cout<< "done"<<endl;break;}
+    if (k==1) {cout<< "done"<<endl;break;}
 /*
     fstream infile;
 //infile.open(path);
