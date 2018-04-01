@@ -66,6 +66,20 @@ iostream
 math.h
 -
 
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/polyRegression.cpp
+iostream
+-
+iomanip
+-
+cmath
+-
+cv.hpp
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/cv.hpp
+vector
+-
+JRC.hpp
+/home/jun/SSD_SLAM/src/JointRadiometicCalib/JRC.hpp
+
 /home/jun/SSD_SLAM/src/klt/convolve.cpp
 assert.h
 -

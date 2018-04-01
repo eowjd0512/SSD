@@ -39,7 +39,7 @@ set(klt_SOURCE_FILES
   ${PROJECT_SOURCE_DIR}/src/JointRadiometicCalib/JRC.cpp
   ${PROJECT_SOURCE_DIR}/src/JointRadiometicCalib/MatrixOperation.cpp
   ${PROJECT_SOURCE_DIR}/src/JointRadiometicCalib/JRCtracking.cpp
- # ${PROJECT_SOURCE_DIR}/thirdParty/klt/trackFeatures.c
+  ${PROJECT_SOURCE_DIR}/src/JointRadiometicCalib/polyRegression.cpp
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/writeFeatures.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/error.c
  # ${PROJECT_SOURCE_DIR}/thirdParty/klt/convolve.c

@@ -614,6 +614,33 @@ src/JointRadiometicCalib/MatrixOperation.cpp.s:
 	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/MatrixOperation.cpp.s
 .PHONY : src/JointRadiometicCalib/MatrixOperation.cpp.s
 
+src/JointRadiometicCalib/polyRegression.o: src/JointRadiometicCalib/polyRegression.cpp.o
+
+.PHONY : src/JointRadiometicCalib/polyRegression.o
+
+# target to build an object file
+src/JointRadiometicCalib/polyRegression.cpp.o:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/polyRegression.cpp.o
+.PHONY : src/JointRadiometicCalib/polyRegression.cpp.o
+
+src/JointRadiometicCalib/polyRegression.i: src/JointRadiometicCalib/polyRegression.cpp.i
+
+.PHONY : src/JointRadiometicCalib/polyRegression.i
+
+# target to preprocess a source file
+src/JointRadiometicCalib/polyRegression.cpp.i:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/polyRegression.cpp.i
+.PHONY : src/JointRadiometicCalib/polyRegression.cpp.i
+
+src/JointRadiometicCalib/polyRegression.s: src/JointRadiometicCalib/polyRegression.cpp.s
+
+.PHONY : src/JointRadiometicCalib/polyRegression.s
+
+# target to generate assembly for a file
+src/JointRadiometicCalib/polyRegression.cpp.s:
+	$(MAKE) -f CMakeFiles/klt.dir/build.make CMakeFiles/klt.dir/src/JointRadiometicCalib/polyRegression.cpp.s
+.PHONY : src/JointRadiometicCalib/polyRegression.cpp.s
+
 src/klt/convolve.o: src/klt/convolve.cpp.o
 
 .PHONY : src/klt/convolve.o
@@ -799,6 +826,9 @@ help:
 	@echo "... src/JointRadiometicCalib/MatrixOperation.o"
 	@echo "... src/JointRadiometicCalib/MatrixOperation.i"
 	@echo "... src/JointRadiometicCalib/MatrixOperation.s"
+	@echo "... src/JointRadiometicCalib/polyRegression.o"
+	@echo "... src/JointRadiometicCalib/polyRegression.i"
+	@echo "... src/JointRadiometicCalib/polyRegression.s"
 	@echo "... src/klt/convolve.o"
 	@echo "... src/klt/convolve.i"
 	@echo "... src/klt/convolve.s"

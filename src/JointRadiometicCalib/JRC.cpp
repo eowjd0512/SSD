@@ -43,8 +43,8 @@ infile >> title>>temp;
 int i=0;
 //cout<< "title: "<<title<<", temp: "<< temp<< endl;
 int k=0;
-
-while(k<1){
+Eigen::VectorXf v = Eigen::VectorXf::Zero(1024);
+while(k<2){
     if (i==1024){
         infile >> title >> temp;
         cout<< "title: "<<title<<", temp: "<< temp<< endl;
@@ -56,6 +56,11 @@ while(k<1){
     
     if(k==0){
         this->B[i] = stof(number);
+    }
+    else if(k==1){
+        float val = log(stof(number));
+        //if(stof(number) ==0.0){val=log(1e-10*255.0);}
+        v(i) = val;
     }
     i++;
 }
@@ -70,7 +75,7 @@ int cnt=0;
 k=-1;
 Mat W_RF(201,1024,CV_64FC1);
 Mat W_RF_inv(201,1024,CV_64FC1);
-Eigen::VectorXf v = Eigen::VectorXf::Zero(1024);
+
 while(1){
     if (flag == false){
     infile >> title;
@@ -106,9 +111,46 @@ while(1){
 }
  //calculate inverse of F
 double min = 999.0;
-double var =0.;
+
 int minIdx=0;
+
+for(int k=0;k<201;k++){
+    cout<<k<<endl;
+    //if (k==150 || k==159) continue;
+    vector<double> x;
+    vector<double> y;
+//for(int k=0;k<1;k++){
+    for(int i=0;i<1024;i++){
+        x.push_back(W_RF.at<double>(k,i));
+        y.push_back(B[i]);
+        //W_RF_inv.at<double>(k,minIdx) = (var);
+        //v(i)+=(var);
+    }
+
+vector<double> coefficient;
+coefficient= polyRegression(x, y, 300);
+    for(int i=0;i<1024;i++){
+        double var =0.;
+        for(int j=0;j<coefficient.size();j++){
+            double x_=1.;
+            for(int m=0;m<j;m++){
+                x_ *= B[i];
+            }
+            var+= coefficient[j]*x_;
+        }
+        //if(var == 0.0) var = 0.0;
+        W_RF_inv.at<double>(k,i)= log(var);
+        //v(i)+=log(var);
+    }
+}
 //Eigen::VectorXd f_inv =Eigen::VectorXd::Zero(1024);
+/*
+double min = 999.0;
+double var=0.;
+int minIdx=0;
+double min2 = 999.0;
+double var2=0.;
+int minIdx2=0;
 for(int k=0;k<201;k++)
     for(int i=0;i<1024;i++){
         for (int j=0; j<1024;j++){
@@ -117,13 +159,26 @@ for(int k=0;k<201;k++)
                 minIdx = j;
             }
         }
-        min = 999.;
-        var = B[minIdx];
-        if(var ==0) var = 1e-20;
-        W_RF_inv.at<double>(k,i) = log(var);
-        v(i)+=log(var);
-    }
+        for (int j=0; j<1024;j++){
+            if (j!=minIdx && abs(W_RF.at<double>(k,j)-B[i])<min &&
+                 (W_RF.at<double>(k,minIdx)-B[i])*(W_RF.at<double>(k,j)-B[i])<0 ){
+                min2 = abs(W_RF.at<double>(k,j)-B[i]);
+                minIdx2 = j;
+            }
+        }
+        double a = W_RF.at<double>(k,minIdx)-B[i];
+        double b = W_RF.at<double>(k,minIdx2)-B[i];
 
+
+
+        min = 999.;
+        min2 = 999.;
+        var = B[minIdx]-abs(B[minIdx]-B[minIdx2])*a/(abs(a)+abs(b));
+        //if(var ==0) var = 1e-20;
+        W_RF_inv.at<double>(k,i) = log(var);
+        //v(i)+=log(var);
+    }
+*/
 /*
     fstream infile;
 //infile.open(path);
@@ -162,20 +217,38 @@ while(k<5){
     }
     i++;*/
     
-    v = v/201;
-    for(int i=0;i<1024;i++){
-          //cout<< W_RF_inv.at<double>(0,i)<< " ";
-        cout<< v(i)<< " ";
+    //v = v/201;
+    for(int k =0;k<200;k++){
+        cout<<k<<endl;
+    for(int i=0;i<1024;i++){//52
+          if(i<53)
+            cout<< W_RF_inv.at<double>(k,i)<< " ";
+        //cout<< v(i)<< " ";
+        
+        ;
          }
-
+         cout<<endl;
+    }
+    cnt=0;
     int offset = 0;   
     Mat C(1024-offset,1024-offset,CV_64FC1);
-    
+    bool nanflag=false;
     for(int y=offset;y<1024;y++){
         for(int x=offset;x<1024;x++){
-            for(int j=0;j<201;j++)
-            C.at<double>(y-offset,x-offset) += (W_RF_inv.at<double>(j,x)-v(x))*(W_RF_inv.at<double>(j,y)-v(y));
-            if(y<256 || x<256){
+            for(int j=0;j<201;j++){
+                for(int m =1; m<52;m++){
+                    if(isnan(W_RF_inv.at<double>(j,m))) nanflag=true;
+                }
+                if(nanflag == false){
+                    C.at<double>(y-offset,x-offset) += (W_RF_inv.at<double>(j,x)-v(x))*(W_RF_inv.at<double>(j,y)-v(y));
+                cnt++;
+                }
+            
+            nanflag=false;
+            }
+            cout <<cnt<<endl;
+            cnt=0;
+            if(y<1 || x<1){
                 C.at<double>(y-offset,x-offset) = 0.;
             }
         }
@@ -183,48 +256,62 @@ while(k<5){
     Mat eValsX;
     Mat eVectsX;
     eigen(C,eValsX,eVectsX);
-
+    //cout<< C<<endl;
     //cout<<eVectsX<<endl;
     //for(int i=0;i<1024;i++){cout<<eVectsX.at<double>(0,i)<<" ";}
-
+    cout<<endl;
+    cout<<"eigen 1"<<endl;
     Mat A(1,1024-offset,CV_64FC1);
     //A.copyTo(C.row(0));
-     for(int i=0;i<1024-offset;i++){
-         A.at<double>(0,i) = eVectsX.at<double>(0,i)*10000;
-         //A.at<double>(0,i) = W_RF.at<double>(0,i);
+     for(int i=0;i<1024-offset;i++){ //52
+         A.at<double>(0,i) = eVectsX.at<double>(0,i)*1000;
+         //A.at<double>(0,i) = W_RF.at<double>(159,i);
          //A.at<double>(0,i) = v(i);
          //A.at<double>(0,i) = eVectsX.at<double>(1,i) * 1000000;
          //A.at<double>(0,i) = v(i) * 10000;
-          cout<< A.at<double>(0,i)<< " ";
+          //cout<< A.at<double>(0,i)/1000.0<< " ";
           }
+          cout<<endl;
     Mat plot_result,plot_result2,plot_result3,plot_result4;
 
+    
     Ptr<plot::Plot2d> plot = plot::Plot2d::create(A);
     plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
     plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
     plot->render( plot_result );
     imshow( "plot", plot_result );
 //////////////////////////////////////////////////////////////////////
+    cout<<"eigen 2"<<endl;
     for(int i=0;i<1024-offset;i++){
-         A.at<double>(0,i) = eVectsX.at<double>(1,i)*10000;
+         //A.at<double>(0,i) = W_RF_inv.at<double>(159,i);
+         A.at<double>(0,i) = eVectsX.at<double>(1,i)*1000;
+         //cout<< A.at<double>(0,i)/1000.0<< " ";
           }
+          
     plot = plot::Plot2d::create(A);
     plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
     plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
     plot->render( plot_result2 );
     imshow( "plot2", plot_result2 );
+    cout<<endl;
     ////////////////////////////////////////////////////////////////////////
+    cout<<"eigen 3"<<endl;
     for(int i=0;i<1024-offset;i++){
-         A.at<double>(0,i) = eVectsX.at<double>(2,i)*10000;
+         A.at<double>(0,i) = eVectsX.at<double>(2,i)*1000;
+         cout<< A.at<double>(0,i)/1000.0<< " ";
           }
+          
     plot = plot::Plot2d::create(A);
     plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
     plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
     plot->render( plot_result3 );
     imshow( "plot3", plot_result3 );
+    cout<<endl;
     /////////////////////////////////////////////////////////////////////////
+    cout<<"eigen 4"<<endl;
     for(int i=0;i<1024-offset;i++){
-         A.at<double>(0,i) = eVectsX.at<double>(3,i)*10000;
+         A.at<double>(0,i) = eVectsX.at<double>(3,i)*1000;
+         //cout<< A.at<double>(0,i)/1000.0<< " ";
           }
     plot = plot::Plot2d::create(A);
     plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );

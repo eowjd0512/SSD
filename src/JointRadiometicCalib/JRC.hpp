@@ -91,6 +91,9 @@ int _JRCtrackFeature(kltFeature f, int pylevel, float x1, float y1, float *x2, f
                     int width, int height, int max_iterations, float small, float th,
                       Mat J_origin,Mat J_gradx,Mat J_grady,Mat I_origin,Mat I_gradx,Mat I_grady, bool trackingMode);
 
+
+vector<double> polyRegression(vector<double> x_,vector<double> y_, int n);
+
 //unused
 float get_a(int x,int y,float g0_[], Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx,bool JRCtrackingMode);
 float get_b(int x,int y,float g0_[], Mat J_origin, Mat I_origin,Mat J_gradY, Mat I_gradY,bool JRCtrackingMode);
@@ -99,6 +102,7 @@ float get_r_k(int x, int y, float h[], Mat J_origin, Mat I_origin);
 float get_p_k(int x, int y, float h_[], Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx);
 float get_q_k(int x, int y, float h_[], Mat J_origin, Mat I_origin,Mat J_grady, Mat I_grady);
 float get_d(int x, int y, float g0[],Mat J_origin, Mat I_origin);
+
 
 /*
 _computeIntensityDifference(img1, img2, x1, y1, *x2, *y2, 
