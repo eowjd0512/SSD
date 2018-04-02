@@ -18,7 +18,7 @@ using namespace std;
 using namespace klt;
 using namespace JRC;
 /// Function header
-#define test
+#define KLT
 
 #ifdef test
 
@@ -55,7 +55,7 @@ void DrawTrackingPoints(vector<kltFeature> featurelist, Mat &image){
 }
 int main (int argc, char *argv[])
 {
-  VideoCapture cap(1);
+  VideoCapture cap(0);
   if(!cap.isOpened()){
     cout<<"Cannot open cap"<<endl;
     return 0;
@@ -70,7 +70,7 @@ int main (int argc, char *argv[])
   int blockSize = 3;
   bool useHarrisDetector = false;
   double k = 0.04;
-  int maxCorners = 500;
+  int maxCorners = 300;
 
   JointRadiometicCalib kltTracker(maxCorners);
   kltTracker.tracker.sequentialMode = true;
@@ -84,7 +84,7 @@ int main (int argc, char *argv[])
 
   int nframe=0;
   //KLT klt = new KLT();
-  
+  int trackingflag=0;
   vector<kltFeature> prevFeaturelist;
   vector<kltFeature> currFeaturelist;
   prevFeaturelist.reserve(maxCorners);
@@ -109,10 +109,12 @@ int main (int argc, char *argv[])
     }
 
     if(!initialization &&prevFeaturelist.size()>0){
-      //kltTracker.JRCtrackFeatures(prevImg,currImg,prevFeaturelist,currFeaturelist);
+      trackingflag= kltTracker.JRCtrackFeatures(prevImg,currImg,prevFeaturelist,currFeaturelist);
       //kltTracker.replaceLostFeatures(currImg, currFeaturelist);
       //cout<<currFeaturelist[0].val<<endl;
-      //DrawTrackingPoints(currFeaturelist,dstImg);
+      if(trackingflag>=0)DrawTrackingPoints(currFeaturelist,dstImg);
+      else{ initialization = true;
+      cerr<<"tracking loss"<<endl;}
     }
     /// Show what you got 
     //namedWindow( source_window, CV_WINDOW_AUTOSIZE );
@@ -148,7 +150,7 @@ void DrawTrackingPoints(vector<Point2f> &points, Mat &image){
 }
 int main (int argc, char *argv[])
 {
-  VideoCapture cap(1);
+  VideoCapture cap(0);
   if(!cap.isOpened()){
     cout<<"Cannot open cap"<<endl;
     return 0;

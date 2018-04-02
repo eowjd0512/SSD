@@ -41,18 +41,19 @@ Eigen::MatrixXd b;
 Eigen::MatrixXd u_;
 Eigen::MatrixXd R;
 Eigen::MatrixXd P_new;
-Eigen::MatrixXd c_new;
-Eigen::MatrixXd c_prev;
+Eigen::VectorXd c_new;
+Eigen::VectorXd c_prev;
 
 
 bool trackingMode; //0 : knownRF, 1: unknownRF
 JointRadiometicCalib(int nfeatures){
-    setRFs(); setRFderivatives(); trackingMode = 1; M=3;
+    setRFs(); setRFderivatives(); trackingMode = 1; this->M=3;
     this->tracker.sequentialMode = true;
     this->tracker.writeInternalImages = false;
     this->tracker.affineConsistencyCheck = -1;  /* set this to 2 to turn on affine consistency check */
     this->nfeatures = nfeatures;
-    this->c_new = Eigen::MatrixXd::Zero(4,1);
+    this->c_new = Eigen::VectorXd::Zero(4);
+    this->c_prev = Eigen::VectorXd::Zero(4);
     this->P_new = Eigen::MatrixXd::Identity(4,4);
     
 }
@@ -60,6 +61,7 @@ JointRadiometicCalib(int nfeatures){
 void cal_g_and_g_();
 int getIdxForRF(float x);
 void setRFs();
+void setRFs(int a);
 void setRFderivatives();
 float getRF_Value(int idx);
 float getRF_DerivValue(int idx);
@@ -77,16 +79,16 @@ Eigen::VectorXd get_m(int window_size, int x, int y, Mat betaM);
 Eigen::VectorXd get_m(int window_size, int x, int y, Mat dM, Mat rM[]);
 
 void blockAllMatrix(int numOfTrackFeature,Eigen::MatrixXd &Uinv_all,Eigen::MatrixXd &w_all,Eigen::VectorXd &v_all,Eigen::MatrixXd &lamda_all,Eigen::VectorXd &m_all, bool JRCtrackingMode);
-float get_K(kltFeature f,Eigen::MatrixXd Uinv_all,Eigen::MatrixXd w_all,Eigen::VectorXd v_all,Eigen::MatrixXd lamda_all,Eigen::VectorXd m_all,bool JRCtrackingMode);
-void initialization(kltFeature f);
-void constructMatrix(kltFeature f,int pylevel,int window_size, int x, int y, Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx,Mat J_grady, Mat I_grady, bool JRCtrackingMode);
-void constructAllMatrix(kltFeature f, int numOfTrackFeature, Eigen::MatrixXd &Uinv_all,Eigen::MatrixXd &w_all,Eigen::VectorXd &v_all,Eigen::MatrixXd &lamda_all,Eigen::VectorXd &m_all);
+float get_K(Eigen::MatrixXd Uinv_all,Eigen::MatrixXd w_all,Eigen::VectorXd v_all,Eigen::MatrixXd lamda_all,Eigen::VectorXd m_all,bool JRCtrackingMode);
+void initialization(kltFeature &f);
+void constructMatrix(kltFeature &f,float g0[],float g0_[],float h[][1024],float h_[][1024], int pylevel,int window_size, int x, int y, Mat J_origin, Mat I_origin,Mat J_gradx, Mat I_gradx,Mat J_grady, Mat I_grady, bool JRCtrackingMode);
+void constructAllMatrix(kltFeature &f, int numOfTrackFeature, Eigen::MatrixXd &Uinv_all,Eigen::MatrixXd &w_all,Eigen::VectorXd &v_all,Eigen::MatrixXd &lamda_all,Eigen::VectorXd &m_all);
 int solveEquation(kltFeature f, int r,float K, float *dx, float *dy,float small,bool trackingMode);
 
 //int trackingKnownRF(float x1, float y1, float *x2, float *y2,Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2);
 //int trackingUnknownRF(float x1, float y1, float *x2, float *y2, Mat img1,Mat gradx1,Mat grady1,Mat img2,Mat gradx2,Mat grady2);
 void updateByKalmanFilter();
-void JRCtrackFeatures(Mat prevImg, Mat currImg, vector<kltFeature> prevfl, vector<kltFeature> &currfl);
+int JRCtrackFeatures(Mat prevImg, Mat currImg, vector<kltFeature> prevfl, vector<kltFeature> &currfl);
 int _JRCtrackFeature(kltFeature f, int pylevel, float x1, float y1, float *x2, float *y2,float K,
                     int width, int height, int max_iterations, float small, float th,
                       Mat J_origin,Mat J_gradx,Mat J_grady,Mat I_origin,Mat I_gradx,Mat I_grady, bool trackingMode);

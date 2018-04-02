@@ -29,22 +29,21 @@ void JointRadiometicCalib::setRFderivatives(){
     for(int i=0;i<1023;i++)
         this->h_[2][i]=get_numerical_derivative(this->h[2],this->B,i);
     this->h_[2][1023] = this->h_[2][1022];
-    //for(int i=0;i<1024;i++) cout<<this->h[0][i]<<" ";
+    //for(int i=0;i<1024;i++) cout<<this->h_[2][i]<<" ";
 }
 void JointRadiometicCalib::setRFs(){
 fstream infile;
 //infile.open(path);
-
-infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/invemor.txt");
+infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/loginvemor.txt");
 string title;
 string temp;
 string number = "";
 infile >> title>>temp;
 int i=0;
-//cout<< "title: "<<title<<", temp: "<< temp<< endl;
+cout<< "title: "<<title<<", temp: "<< temp<< endl;
 int k=0;
-Eigen::VectorXf v = Eigen::VectorXf::Zero(1024);
-while(k<2){
+
+while(k<5){
     if (i==1024){
         infile >> title >> temp;
         cout<< "title: "<<title<<", temp: "<< temp<< endl;
@@ -55,15 +54,69 @@ while(k<2){
     infile >> number;
     
     if(k==0){
+        this->B[i] = stof(number)*255.0;
+    }
+    
+    if(k==1){
+        float val = (stof(number));
+        //if(stof(number) ==0.0){val=log(1e-10*255.0);}
+        this->g0[i] = val;
+    }else if(k>1){
+        float val = (stof(number));
+        //if(stof(number) ==0.0){val=log(1e-10*255.0);}
+        //cout<< "number: "<<number;
+        this->h[k-2][i]=val;
+    }
+    i++;
+ }   
+ this->g0[0] = this->g0[1];
+ this->h[0][0] = this->h[0][1];
+ this->h[1][0] = this->h[1][1];
+ this->h[2][0] = this->h[2][1];
+    //cout<< W_RF<<endl;
+//cout<< "i: "<<i<<endl;
+//for(int i=0;i<1024;i++) cout<<this->h[0][i]<<" ";
+
+}
+void JointRadiometicCalib::setRFs(int a){
+fstream infile;
+//infile.open(path);
+ofstream outfile("/home/jun/SSD_SLAM/src/JointRadiometicCalib/loginvemor_normal.txt");
+infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/invemor.txt");
+string title;
+string temp;
+string number = "";
+infile >> title>>temp;
+int i=0;
+//cout<< "title: "<<title<<", temp: "<< temp<< endl;
+int k=0;
+Eigen::VectorXf v = Eigen::VectorXf::Zero(1024);
+
+outfile<<"g0 = "<<endl;
+
+while(k<2){
+    if (i==1024){
+        infile >> title >> temp;
+        cout<< "title: "<<title<<", temp: "<< temp<< endl;
+        i=0;    
+        k++;
+    }
+    
+    infile >> number;
+    
+    if(k==0){
         this->B[i] = stof(number);
     }
     else if(k==1){
-        float val = log(stof(number));
+        float val = log(stof(number)*255.0);
         //if(stof(number) ==0.0){val=log(1e-10*255.0);}
+        outfile << val <<"   ";
         v(i) = val;
     }
     i++;
 }
+outfile<<endl;
+
 cout<< "done"<<endl;
 infile.close();
 infile.open("/home/jun/SSD_SLAM/src/JointRadiometicCalib/dorfCurves.txt");
@@ -139,7 +192,7 @@ coefficient= polyRegression(x, y, 300);
             var+= coefficient[j]*x_;
         }
         //if(var == 0.0) var = 0.0;
-        W_RF_inv.at<double>(k,i)= log(var);
+        W_RF_inv.at<double>(k,i)= log(var)+5.54126354516;
         //v(i)+=log(var);
     }
 }
@@ -222,7 +275,7 @@ while(k<5){
         cout<<k<<endl;
     for(int i=0;i<1024;i++){//52
           if(i<53)
-            cout<< W_RF_inv.at<double>(k,i)<< " ";
+            //cout<< W_RF_inv.at<double>(k,i)<< " ";
         //cout<< v(i)<< " ";
         
         ;
@@ -246,7 +299,7 @@ while(k<5){
             
             nanflag=false;
             }
-            cout <<cnt<<endl;
+            //cout <<cnt<<endl;
             cnt=0;
             if(y<1 || x<1){
                 C.at<double>(y-offset,x-offset) = 0.;
@@ -261,6 +314,7 @@ while(k<5){
     //for(int i=0;i<1024;i++){cout<<eVectsX.at<double>(0,i)<<" ";}
     cout<<endl;
     cout<<"eigen 1"<<endl;
+    outfile<<"loghinv(1) = "<<endl;
     Mat A(1,1024-offset,CV_64FC1);
     //A.copyTo(C.row(0));
      for(int i=0;i<1024-offset;i++){ //52
@@ -270,7 +324,9 @@ while(k<5){
          //A.at<double>(0,i) = eVectsX.at<double>(1,i) * 1000000;
          //A.at<double>(0,i) = v(i) * 10000;
           //cout<< A.at<double>(0,i)/1000.0<< " ";
+          outfile<<eVectsX.at<double>(0,i)<<"   ";
           }
+          outfile<<endl;
           cout<<endl;
     Mat plot_result,plot_result2,plot_result3,plot_result4;
 
@@ -282,12 +338,14 @@ while(k<5){
     imshow( "plot", plot_result );
 //////////////////////////////////////////////////////////////////////
     cout<<"eigen 2"<<endl;
+    outfile<<"loghinv(2) = "<<endl;
     for(int i=0;i<1024-offset;i++){
          //A.at<double>(0,i) = W_RF_inv.at<double>(159,i);
          A.at<double>(0,i) = eVectsX.at<double>(1,i)*1000;
+         outfile<<eVectsX.at<double>(1,i)<<"   ";
          //cout<< A.at<double>(0,i)/1000.0<< " ";
           }
-          
+          outfile<<endl;
     plot = plot::Plot2d::create(A);
     plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
     plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
@@ -296,11 +354,13 @@ while(k<5){
     cout<<endl;
     ////////////////////////////////////////////////////////////////////////
     cout<<"eigen 3"<<endl;
+    outfile<<"loghinv(3) = "<<endl;
     for(int i=0;i<1024-offset;i++){
          A.at<double>(0,i) = eVectsX.at<double>(2,i)*1000;
          cout<< A.at<double>(0,i)/1000.0<< " ";
+         outfile<<eVectsX.at<double>(2,i)<<"   ";
           }
-          
+          outfile<<endl;
     plot = plot::Plot2d::create(A);
     plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
     plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
@@ -309,16 +369,18 @@ while(k<5){
     cout<<endl;
     /////////////////////////////////////////////////////////////////////////
     cout<<"eigen 4"<<endl;
+    outfile<<"loghinv(4) = "<<endl;
     for(int i=0;i<1024-offset;i++){
          A.at<double>(0,i) = eVectsX.at<double>(3,i)*1000;
          //cout<< A.at<double>(0,i)/1000.0<< " ";
+         outfile<<eVectsX.at<double>(3,i)<<"   ";
           }
     plot = plot::Plot2d::create(A);
     plot->setPlotBackgroundColor( Scalar( 50, 50, 50 ) );
     plot->setPlotLineColor( Scalar( 50, 50, 255 ) );
     plot->render( plot_result4 );
     imshow( "plot4", plot_result4 );
-
+    outfile.close();
     //cout<< W_RF<<endl;
 //cout<< "i: "<<i<<endl;
 //for(int i=0;i<1024;i++) if(i==514)cout<<this->g0[i]<<" ";
@@ -429,27 +491,35 @@ float JointRadiometicCalib::get_d(int x, int y, float g0[],Mat J_origin, Mat I_o
 }
 
 void JointRadiometicCalib::updateByKalmanFilter(){
-    Eigen::MatrixXd c_prior = this->c_new;
+    //cout<<"3"<<endl;
+    Eigen::VectorXd c_prior = this->c_new;
     Eigen::MatrixXd P_prior = this->P_new;
     Eigen::MatrixXd identity = Eigen::MatrixXd::Identity(4,4);
     Eigen::MatrixXd temp = (this->D.transpose()*this->D).inverse();
     Eigen::MatrixXd temp2 = this->D*this->u_-this->b;
     Eigen::MatrixXd temp3 = temp2*temp2.transpose();
     Eigen::MatrixXd R = temp*temp3;
-
+     //cout<<"33"<<endl;
     Eigen::MatrixXd k = P_prior*(P_prior+R).inverse();
     this->c_new = c_prior+k*(this->u_-c_prior);
     this->P_new = (identity-k)*P_prior;
-
+     //cout<<"333"<<endl;
     static int stableCount=0;
-    if(abs(c_new(0)-c_prev(0))<1 &&abs(c_new(1)-c_prev(1))<1&& abs(c_new(2)-c_prev(2))<1 )
+    //if(knownRFfirst != 1)
+    if(abs(this->c_new(0)-this->c_prev(0))<1 &&abs(this->c_new(1)-this->c_prev(1))<1&& abs(this->c_new(2)-this->c_prev(2))<1 )
         stableCount++;
         if(stableCount >3){
+            cout<<"turn trackingMode to knownRF"<<endl;
             this->trackingMode =0;
             this->c[0] = this->c_new(0);
             this->c[1] = this->c_new(1);
             this->c[2] = this->c_new(2);
         }
+     //cout<<"333"<<endl;
+     //cout<<this->c_new.rows()<<endl;
+     //cout<<this->c_prev.rows()<<endl;
+     this->c_prev = this->c_new;
+     //cout<<"3333"<<endl;
 }
 
 }

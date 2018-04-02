@@ -4,6 +4,7 @@
 #include "JRC.hpp"
 #include <iostream>
 #include <math.h>
+#include "time.h"
 //#include "eigen3/Eigen/Dense"
 using namespace cv;
 using namespace std;
@@ -74,7 +75,7 @@ static bool _outOfBounds(
     return (x < borderx || x > ncols-1-borderx ||
             y < bordery || y > nrows-1-bordery );
     }
-void JointRadiometicCalib::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<kltFeature> prevfl, vector<kltFeature> &currfl){
+int JointRadiometicCalib::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<kltFeature> prevfl, vector<kltFeature> &currfl){
     Mat tmpimg, floatimg1, floatimg2;
     currfl=prevfl;
     //int MaxPyLevel = 3;
@@ -145,50 +146,77 @@ void JointRadiometicCalib::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<klt
     //JRC::JointRadiometicCalib jrc;
     bool JRCtrackingMode = this->trackingMode;
     Eigen::MatrixXd Uinv_all = Eigen::MatrixXd::Zero(nfeature*8,nfeature*8);
-    Eigen::MatrixXd w_all = Eigen::MatrixXd::Zero(nfeature*8,nfeature*4);
-    Eigen::VectorXd v_all = Eigen::MatrixXd::Zero(nfeature*8,nfeature*1);
+    Eigen::MatrixXd w_all = Eigen::MatrixXd::Zero(nfeature*8,4);
+    Eigen::VectorXd v_all = Eigen::MatrixXd::Zero(nfeature*8,1);
     //Eigen::MatrixXd z_all = Eigen::MatrixXd::Zero(nfeature*8,nfeature*8);
     Eigen::MatrixXd lamda_all = Eigen::MatrixXd::Zero(4,4);
     Eigen::VectorXd m_all = Eigen::MatrixXd::Zero(4,1);
     int numOfTrackFeature=0;
     static unsigned int knownRFfirst=0;
-    if (JRCtrackingMode == 1){
+    if (JRCtrackingMode == 0){
         knownRFfirst++;
     }
     if (knownRFfirst ==1) cal_g_and_g_();
+    //cout<<"-1"<<endl;
+    clock_t before;
+    double  result;
+    before  = clock();
     for (indx = 0 ; indx < nfeature ; indx++)  {
-        
+        //cout<<"indx: "<<indx<<endl;
         /* Only track features that are not lost */
-        if (prevfl[indx].val >= 0)  {
-            if (prevfl[indx].used == false){
+        if (currfl[indx].val >= 0)  {
+            if (currfl[indx].used == false){
                     //initialization
-                initialization(prevfl[indx]);
-                prevfl[indx].used = true;
+                    //cout<<"-2"<<endl;
+                initialization(currfl[indx]);
+                currfl[indx].used = true;
             }
-            cout<<"0"<<endl;
+            //cout<<"k"<<endl;
+            //if(indx ==0 )cout<<"x: "<< prevfl[indx].pt.x<<", y : "<<prevfl[indx].pt.y <<endl;
             // 1.  create  U, w, lamda, v, m for all features
-            constructMatrix(prevfl[indx],0, ksize, prevfl[indx].pt.x, prevfl[indx].pt.y, pyramid2[0], pyramid1[0] ,pyramid2_gradx[0], pyramid1_gradx[0],pyramid2_grady[0], pyramid1_grady[0],JRCtrackingMode);
+
             
+
+            constructMatrix(currfl[indx],this->g0,this->g0_,this->h,this->h_,0, ksize, currfl[indx].pt.x, currfl[indx].pt.y, pyramid2[0], pyramid1[0] ,pyramid2_gradx[0], pyramid1_gradx[0],pyramid2_grady[0], pyramid1_grady[0],JRCtrackingMode);
+            //cout<<"a"<<endl;
             //for constructing all Matrix
-            constructAllMatrix(prevfl[indx], numOfTrackFeature,Uinv_all,w_all,v_all,lamda_all,m_all);
+            constructAllMatrix(currfl[indx], numOfTrackFeature,Uinv_all,w_all,v_all,lamda_all,m_all);
+            
+            //cout<<"b"<<endl;
+
             numOfTrackFeature++;
         }
 
     }
+    
+    //cout<<"0"<<endl;
     // 2. calculate K by all featurs
     float K=0; //K is exposure time difference between two images.
     blockAllMatrix(numOfTrackFeature,Uinv_all,w_all,v_all,lamda_all,m_all,JRCtrackingMode);
-    K= get_K(prevfl[indx],Uinv_all,w_all,v_all,lamda_all,m_all,JRCtrackingMode);
-    
+    //cout<<"00"<<endl;
+    //cout<<"JRCtrackingMode: "<<JRCtrackingMode<<endl;
+    //cout<<numOfTrackFeature<<endl;
+    //cout<<"Uinv_all row: "<<Uinv_all.rows() << ", Uinv_all cols: "<<Uinv_all.cols()<<endl;
+    //cout<<"w_all row: "<<w_all.rows() << ", w_all cols: "<<w_all.cols()<<endl;
+    //cout<<"v_all row: "<<v_all.rows() << ", v_all cols: "<<v_all.cols()<<endl;
+    //cout<<"lamda_all row: "<<lamda_all.rows() << ", lamda_all cols: "<<lamda_all.cols()<<endl;
+    //cout<<"m_all row: "<<m_all.rows() << ", m_all cols: "<<m_all.cols()<<endl;
+    K= get_K(Uinv_all,w_all,v_all,lamda_all,m_all,JRCtrackingMode); 
+    cout<<"print K: "<<K<<endl;
+    cout<<endl;
+    result = (double)(clock() - before) / CLOCKS_PER_SEC;
+    cout<<"constructAllMatrix  "<< result<<" sec"<<endl;
+    if(isnan(K)) return -1;
+    //cout<<"3"<<endl;
     // 3.  calculate each dx, dy with respect to each feature     
     /* For each feature, do ... */
     for (indx = 0 ; indx < nfeature ; indx++)  {
 
         /* Only track features that are not lost */
-        if (prevfl[indx].val >= 0)  {
+        if (currfl[indx].val >= 0)  {
 
-            xloc = prevfl[indx].pt.x;
-            yloc = prevfl[indx].pt.y;
+            xloc = currfl[indx].pt.x;
+            yloc = currfl[indx].pt.y;
 
             /* Transform location to coarsest resolution */
             for (r = MaxPyLevel - 1 ; r >= 0 ; r--)  {
@@ -198,11 +226,10 @@ void JointRadiometicCalib::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<klt
 
             /* Beginning with coarsest resolution, do ... */
             for (r = MaxPyLevel - 1 ; r >= 0 ; r--)  {
-                
                 /* Track feature at current resolution */
                 xloc *= subsampling;  yloc *= subsampling;
                 xlocout *= subsampling;  ylocout *= subsampling;
-                val = _JRCtrackFeature(prevfl[indx], r, xloc, yloc, 
+                val = _JRCtrackFeature(currfl[indx], r, xloc, yloc, 
                     &xlocout, &ylocout,K, ksize, ksize, max_iterations, small,th,
                     pyramid2[r], 
                     pyramid2_gradx[r], pyramid2_grady[r],
@@ -218,6 +245,7 @@ void JointRadiometicCalib::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<klt
                 if (val==KLT_SMALL_DET || val==KLT_OOB)
                     break;
             }
+            //cout<<val<<endl;
             //cout<<"val: "<<val<<endl;
             /* Record feature */
             if (val == KLT_OOB) {
@@ -272,9 +300,10 @@ void JointRadiometicCalib::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<klt
             }
         }
     }
+    //cout<<"4"<<endl;
     if (JRCtrackingMode == 1)
         updateByKalmanFilter();
-
+    //cout<<"5"<<endl;
     if (this->tracker.sequentialMode)  {
         this->tracker.pyramid_last = pyramid2;
         this->tracker.pyramid_last_gradx = pyramid2_gradx;
@@ -284,7 +313,7 @@ void JointRadiometicCalib::JRCtrackFeatures(Mat prevImg, Mat currImg, vector<klt
         pyramid2_gradx.clear();
         pyramid2_grady.clear();
     }
-
+    //cout<<"6"<<endl;
     /* Free memory */
     pyramid1.clear();
     pyramid1_gradx.clear();
@@ -316,18 +345,18 @@ int JointRadiometicCalib::_JRCtrackFeature(kltFeature f, int pylevel, float x1, 
         break;
         }
         if(pylevel!=0)
-            constructMatrix(f,pylevel,width,x1,y1,J_origin,I_origin,J_gradx,I_gradx,J_grady,I_grady,trackingMode);
+            constructMatrix(f,this->g0,this->g0_,this->h,this->h_,pylevel,width,x1,y1,J_origin,I_origin,J_gradx,I_gradx,J_grady,I_grady,trackingMode);
                     
         /* Using matrices, solve equation for new displacement */
         status = solveEquation(f, pylevel, K,&dx, &dy, small,trackingMode);
         if (status == KLT_SMALL_DET)  break;
-        
+        //cout<<"dx: "<<dx<<" , dy: "<<dy<<endl;
         *x2 += dx;
         *y2 += dy;
         iteration++;
 
     }  while ((fabs(dx)>=th || fabs(dy)>=th) && iteration < max_iterations);
-
+    //cout<<"while done"<<endl;
     /* Check whether window is out of bounds */
     if (*x2-hw < 0.0f || nc-(*x2+hw) < one_plus_eps || 
         *y2-hh < 0.0f || nr-(*y2+hh) < one_plus_eps)

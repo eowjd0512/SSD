@@ -84,7 +84,7 @@ vector<double> JointRadiometicCalib::polyRegression(vector<double> x_,vector<dou
     }  
     //cout<<"\nHence the fitted Polynomial is given by:\ny=";
     //for (i=0;i<n;i++)
-       // cout<<" + ("<<a[i]<<")"<<"x^"<<i;
+        //cout<<" + ("<<a[i]<<")"<<"x^"<<i;
     //cout<<"\n";
     return coefficient;
 }//output attached as .jpg
